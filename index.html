@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Estação Central - Colatina</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #ffffff;
+            --header-bg: #212121; /* Cinza escuro para o cabeçalho */
+            --header-text: #ffffff;
+            --header-accent: #ffd700; /* Amarelo para ícone e hora */
+            --card-bg: #f8f9fa;
+            --card-border: #e0e0e0;
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --vjd-color: #0056b3; /* Azul Joana D'arc */
+            --vsr-color: #008444; /* Verde São Roque */
+            --time-card-bg: #27ae60;
+        }
+
+        body { 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; padding: 0;
+            overflow: hidden;
+        }
+
+        /* Cabeçalho Escuro conforme solicitado */
+        .header { 
+            background: var(--header-bg); 
+            padding: 20px 40px; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-left i { font-size: 45px; color: var(--header-accent); }
+        .header-title { 
+            font-size: 1.5rem; font-weight: 700; text-transform: uppercase; 
+            line-height: 1.2; color: var(--header-text); 
+        }
+
+        .header-right { text-align: right; }
+        #hora-atual { font-size: 3rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; }
+        #data-atual { font-size: 1rem; color: #cccccc; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+
+        /* Lista de Horários em Fundo Branco */
+        .lista-horarios { 
+            height: calc(100vh - 120px);
+            overflow-y: auto; padding: 25px 40px;
+            box-sizing: border-box;
+        }
+
+        .linha-item { 
+            background: var(--card-bg); margin-bottom: 18px;
+            display: flex; align-items: center;
+            border-radius: 10px; overflow: hidden;
+            border: 1px solid var(--card-border); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .indicador-empresa { width: 15px; height: 95px; flex-shrink: 0; }
+
+        .numero-box { 
+            padding: 0 20px; font-size: 32px; font-weight: 900;
+            color: var(--text-main); min-width: 100px; text-align: center;
+        }
+
+        .detalhes { flex-grow: 1; padding: 15px 0; }
+        .destino-destaque { 
+            font-weight: 800; font-size: 1.7rem; 
+            text-transform: uppercase; color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        .nome-linha-sub { font-size: 1.05rem; color: var(--text-sub); font-weight: 500; }
+
+        .tempo-container { padding: 0 30px; }
+        .tempo-card {
+            background: var(--time-card-bg); color: #ffffff;
+            padding: 12px 25px; border-radius: 8px;
+            font-weight: 800; font-size: 1.9rem;
+            min-width: 130px; text-align: center;
+            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; }
+            #hora-atual { font-size: 2.2rem; }
+            .destino-destaque { font-size: 1.2rem; }
+            .tempo-card { font-size: 1.4rem; min-width: 100px; }
+            .numero-box { font-size: 24px; min-width: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <i class="material-icons">directions_bus</i>
+        <span class="header-title">Horários de ônibus<br>em tempo real</span>
+    </div>
+    <div class="header-right">
+        <span id="hora-atual">00:00</span>
+        <div id="data-atual">-- -- ----</div>
+    </div>
+</div>
+
+<div id="lista-horarios" class="lista-horarios">
+    </div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
+
+<script>
+function atualizarRelogio() {
+    const agora = new Date();
+    document.getElementById('hora-atual').textContent = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+    document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+}
+
+function buscarProximasLinhas() {
+    const ds = new google.maps.DirectionsService();
+    const estaçãoCentral = new google.maps.LatLng(-19.5368231, -40.633973);
+    
+    ds.route({
+        origin: estaçãoCentral,
+        destination: new google.maps.LatLng(-19.5300, -40.6300), 
+        travelMode: google.maps.TravelMode.TRANSIT,
+        transitOptions: { departureTime: new Date(), modes: ['BUS'] },
+        provideRouteAlternatives: true 
+    }, (response, status) => {
+        const container = document.getElementById('lista-horarios');
+        if (status === 'OK') {
+            container.innerHTML = ""; 
+            
+            const rotas = response.routes.sort((a, b) => {
+                const stepA = a.legs[0].steps.find(s => s.transit);
+                const stepB = b.legs[0].steps.find(s => s.transit);
+                if (!stepA || !stepB) return 0;
+                return stepA.transit.departure_time.value - stepB.transit.departure_time.value;
+            });
+
+            rotas.forEach((rota) => {
+                const step = rota.legs[0].steps.find(s => s.travel_mode === "TRANSIT");
+                if (step && step.transit) {
+                    const t = step.transit;
+                    const numeroOriginal = t.line.short_name || "0";
+                    const numeroApenas = parseInt(numeroOriginal.replace(/\D/g, "")) || 0;
+                    
+                    let corEmpresa = "var(--vjd-color)"; 
+                    if (numeroApenas >= 300 && numeroApenas <= 499) {
+                        corEmpresa = "var(--vsr-color)";
+                    }
+
+                    container.innerHTML += `
+                        <div class="linha-item">
+                            <div class="indicador-empresa" style="background: ${corEmpresa}"></div>
+                            <div class="numero-box">${numeroOriginal}</div>
+                            <div class="detalhes">
+                                <div class="destino-destaque">${t.headsign}</div>
+                                <div class="nome-linha-sub">Linha: ${t.line.name}</div>
+                            </div>
+                            <div class="tempo-container">
+                                <div class="tempo-card">${t.departure_time.text}</div>
+                            </div>
+                        </div>`;
+                }
+            });
+        }
+    });
+}
+
+setInterval(atualizarRelogio, 1000);
+setInterval(buscarProximasLinhas, 600000); 
+
+window.onload = () => {
+    atualizarRelogio();
+    buscarProximasLinhas();
+};
+</script>
+</body>
+</html>
