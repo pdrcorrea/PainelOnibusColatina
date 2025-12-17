@@ -8,15 +8,15 @@
     <style>
         :root {
             --bg-body: #ffffff;
-            --header-bg: #212121; /* Cinza escuro para o cabeçalho */
+            --header-bg: #212121;
             --header-text: #ffffff;
-            --header-accent: #ffd700; /* Amarelo para ícone e hora */
+            --header-accent: #ffd700;
             --card-bg: #f8f9fa;
             --card-border: #e0e0e0;
             --text-main: #1a1a1a;
             --text-sub: #666666;
             --vjd-color: #0056b3; /* Azul Joana D'arc */
-            --vsr-color: #00bfff; /* Verde São Roque */
+            --vsr-color: #008444; /* Verde São Roque */
             --time-card-bg: #27ae60;
         }
 
@@ -28,7 +28,6 @@
             overflow: hidden;
         }
 
-        /* Cabeçalho Escuro conforme solicitado */
         .header { 
             background: var(--header-bg); 
             padding: 20px 40px; 
@@ -47,7 +46,6 @@
         #hora-atual { font-size: 3rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; }
         #data-atual { font-size: 1rem; color: #cccccc; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
 
-        /* Lista de Horários em Fundo Branco */
         .lista-horarios { 
             height: calc(100vh - 120px);
             overflow-y: auto; padding: 25px 40px;
@@ -55,7 +53,7 @@
         }
 
         .linha-item { 
-            background: var(--card-bg); margin-bottom: 18px;
+            background: var(--card-bg); margin-bottom: 15px;
             display: flex; align-items: center;
             border-radius: 10px; overflow: hidden;
             border: 1px solid var(--card-border); 
@@ -69,29 +67,27 @@
             color: var(--text-main); min-width: 100px; text-align: center;
         }
 
-        .detalhes { flex-grow: 1; padding: 15px 0; }
+        .detalhes { flex-grow: 1; padding: 15px 0; overflow: hidden; }
         .destino-destaque { 
             font-weight: 800; font-size: 1.7rem; 
             text-transform: uppercase; color: var(--text-main);
-            margin-bottom: 2px;
+            margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .nome-linha-sub { font-size: 1.05rem; color: var(--text-sub); font-weight: 500; }
 
         .tempo-container { padding: 0 30px; }
         .tempo-card {
             background: var(--time-card-bg); color: #ffffff;
-            padding: 12px 25px; border-radius: 8px;
-            font-weight: 800; font-size: 1.9rem;
+            padding: 12px 20px; border-radius: 8px;
+            font-weight: 800; font-size: 1.8rem;
             min-width: 130px; text-align: center;
-            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
         }
 
         @media (max-width: 768px) {
             .header { padding: 15px 20px; }
             #hora-atual { font-size: 2.2rem; }
             .destino-destaque { font-size: 1.2rem; }
-            .tempo-card { font-size: 1.4rem; min-width: 100px; }
-            .numero-box { font-size: 24px; min-width: 80px; }
+            .tempo-card { font-size: 1.3rem; min-width: 100px; }
         }
     </style>
 </head>
@@ -109,7 +105,8 @@
 </div>
 
 <div id="lista-horarios" class="lista-horarios">
-    </div>
+    <div style="text-align:center; padding:50px; color:#999; font-size:1.5rem;">Sincronizando horários da Estação Central...</div>
+</div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
 
@@ -120,60 +117,97 @@ function atualizarRelogio() {
     document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
 }
 
-function buscarProximasLinhas() {
+async function buscarProximasLinhas() {
     const ds = new google.maps.DirectionsService();
     const estaçãoCentral = new google.maps.LatLng(-19.5368231, -40.633973);
     
-    ds.route({
-        origin: estaçãoCentral,
-        destination: new google.maps.LatLng(-19.5300, -40.6300), 
-        travelMode: google.maps.TravelMode.TRANSIT,
-        transitOptions: { departureTime: new Date(), modes: ['BUS'] },
-        provideRouteAlternatives: true 
-    }, (response, status) => {
-        const container = document.getElementById('lista-horarios');
-        if (status === 'OK') {
-            container.innerHTML = ""; 
+    // Três destinos para cobrir todas as rotas de Colatina (Norte, Sul, Leste)
+    const destinos = [
+        new google.maps.LatLng(-19.5300, -40.6300), 
+        new google.maps.LatLng(-19.5450, -40.6500), 
+        new google.maps.LatLng(-19.5200, -40.6100)  
+    ];
+
+    let promessas = destinos.map(destino => {
+        return new Promise((resolve) => {
+            ds.route({
+                origin: estaçãoCentral,
+                destination: destino,
+                travelMode: google.maps.TravelMode.TRANSIT,
+                transitOptions: { departureTime: new Date(), modes: ['BUS'] },
+                provideRouteAlternatives: true
+            }, (response, status) => {
+                if (status === 'OK') resolve(response.routes);
+                else resolve([]);
+            });
+        });
+    });
+
+    const resultados = await Promise.all(promessas);
+    let linhasUnicas = new Map();
+
+    resultados.flat().forEach(rota => {
+        const step = rota.legs[0].steps.find(s => s.travel_mode === "TRANSIT");
+        if (step && step.transit) {
+            const t = step.transit;
+            // A chave única evita que a mesma linha apareça duplicada se servir para dois destinos
+            const chaveUnica = `${t.line.short_name}-${t.departure_time.text}`;
             
-            const rotas = response.routes.sort((a, b) => {
-                const stepA = a.legs[0].steps.find(s => s.transit);
-                const stepB = b.legs[0].steps.find(s => s.transit);
-                if (!stepA || !stepB) return 0;
-                return stepA.transit.departure_time.value - stepB.transit.departure_time.value;
-            });
-
-            rotas.forEach((rota) => {
-                const step = rota.legs[0].steps.find(s => s.travel_mode === "TRANSIT");
-                if (step && step.transit) {
-                    const t = step.transit;
-                    const numeroOriginal = t.line.short_name || "0";
-                    const numeroApenas = parseInt(numeroOriginal.replace(/\D/g, "")) || 0;
-                    
-                    let corEmpresa = "var(--vjd-color)"; 
-                    if (numeroApenas >= 300 && numeroApenas <= 499) {
-                        corEmpresa = "var(--vsr-color)";
-                    }
-
-                    container.innerHTML += `
-                        <div class="linha-item">
-                            <div class="indicador-empresa" style="background: ${corEmpresa}"></div>
-                            <div class="numero-box">${numeroOriginal}</div>
-                            <div class="detalhes">
-                                <div class="destino-destaque">${t.headsign}</div>
-                                <div class="nome-linha-sub">Linha: ${t.line.name}</div>
-                            </div>
-                            <div class="tempo-container">
-                                <div class="tempo-card">${t.departure_time.text}</div>
-                            </div>
-                        </div>`;
-                }
-            });
+            if (!linhasUnicas.has(chaveUnica)) {
+                linhasUnicas.set(chaveUnica, {
+                    numero: t.line.short_name || "---",
+                    destino: t.headsign,
+                    nomeLinha: t.line.name,
+                    horaSaida: t.departure_time.text,
+                    timestamp: t.departure_time.value
+                });
+            }
         }
+    });
+
+    // Ordena pelo horário mais próximo e pega os 12 primeiros
+    const listaFinal = Array.from(linhasUnicas.values())
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .slice(0, 12);
+
+    renderizarPainel(listaFinal);
+}
+
+function renderizarPainel(lista) {
+    const container = document.getElementById('lista-horarios');
+    if (lista.length === 0) {
+        container.innerHTML = "<div style='text-align:center; padding:50px; color:#999;'>Sem autocarros previstos para os próximos minutos.</div>";
+        return;
+    }
+
+    container.innerHTML = "";
+    lista.forEach(item => {
+        const numeroApenas = parseInt(item.numero.replace(/\D/g, "")) || 0;
+        
+        // Lógica de cores baseada na tua regra de numeração
+        let corEmpresa = "var(--vjd-color)"; // Joana D'arc (0-299)
+        if (numeroApenas >= 300 && numeroApenas <= 499) {
+            corEmpresa = "var(--vsr-color)"; // São Roque (300-499)
+        }
+
+        container.innerHTML += `
+            <div class="linha-item">
+                <div class="indicador-empresa" style="background: ${corEmpresa}"></div>
+                <div class="numero-box">${item.numero}</div>
+                <div class="detalhes">
+                    <div class="destino-destaque">${item.destino}</div>
+                    <div class="nome-linha-sub">Linha: ${item.nomeLinha}</div>
+                </div>
+                <div class="tempo-container">
+                    <div class="tempo-card">${item.horaSaida}</div>
+                </div>
+            </div>`;
     });
 }
 
+// Inicialização e Timers
 setInterval(atualizarRelogio, 1000);
-setInterval(buscarProximasLinhas, 600000); 
+setInterval(buscarProximasLinhas, 600000); // Atualiza a cada 10 minutos
 
 window.onload = () => {
     atualizarRelogio();
@@ -181,5 +215,4 @@ window.onload = () => {
 };
 </script>
 </body>
-
 </html>
