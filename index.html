@@ -8,15 +8,15 @@
     <style>
         :root {
             --bg-body: #ffffff;
-            --header-bg: #212121;
+            --header-bg: #1a1a1a; /* Tom mais escuro para o cabeçalho */
             --header-text: #ffffff;
-            --header-accent: #ffd700;
+            --header-accent: #ffd700; /* Amarelo do ícone e hora */
             --card-bg: #f8f9fa;
             --card-border: #e0e0e0;
             --text-main: #1a1a1a;
             --text-sub: #666666;
             --vjd-color: #0056b3; /* Azul Joana D'arc */
-            --vsr-color: #00bfff; /* Verde São Roque */
+            --vsr-color: ##00bfff; /* Verde São Roque */
             --time-card-bg: #27ae60;
         }
 
@@ -28,26 +28,36 @@
             overflow: hidden;
         }
 
+        /* Cabeçalho inspirado na imagem enviada */
         .header { 
             background: var(--header-bg); 
-            padding: 20px 40px; 
+            padding: 15px 40px; 
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-left i { font-size: 45px; color: var(--header-accent); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-left i { font-size: 48px; color: var(--header-accent); }
+        
+        .title-group { display: flex; flex-direction: column; }
         .header-title { 
-            font-size: 1.5rem; font-weight: 700; text-transform: uppercase; 
-            line-height: 1.2; color: var(--header-text); 
+            font-size: 1.8rem; font-weight: 900; text-transform: uppercase; 
+            letter-spacing: 1px; color: var(--header-text); line-height: 1;
         }
+        .header-subtitle { 
+            font-size: 0.95rem; font-weight: 600; color: #a0a0a0; 
+            text-transform: uppercase; margin-top: 5px; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .header-subtitle .pin { color: #ff4d4d; font-size: 16px; }
 
         .header-right { text-align: right; }
         #hora-atual { font-size: 3rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; }
-        #data-atual { font-size: 1rem; color: #cccccc; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+        #data-atual { font-size: 0.9rem; color: #888; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
 
+        /* Lista de Horários */
         .lista-horarios { 
-            height: calc(100vh - 120px);
+            height: calc(100vh - 100px);
             overflow-y: auto; padding: 25px 40px;
             box-sizing: border-box;
         }
@@ -55,39 +65,40 @@
         .linha-item { 
             background: var(--card-bg); margin-bottom: 15px;
             display: flex; align-items: center;
-            border-radius: 10px; overflow: hidden;
+            border-radius: 12px; overflow: hidden;
             border: 1px solid var(--card-border); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
         .indicador-empresa { width: 15px; height: 95px; flex-shrink: 0; }
 
         .numero-box { 
-            padding: 0 20px; font-size: 32px; font-weight: 900;
+            padding: 0 20px; font-size: 34px; font-weight: 900;
             color: var(--text-main); min-width: 100px; text-align: center;
         }
 
         .detalhes { flex-grow: 1; padding: 15px 0; overflow: hidden; }
         .destino-destaque { 
-            font-weight: 800; font-size: 1.7rem; 
+            font-weight: 800; font-size: 1.8rem; 
             text-transform: uppercase; color: var(--text-main);
             margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .nome-linha-sub { font-size: 1.05rem; color: var(--text-sub); font-weight: 500; }
+        .nome-linha-sub { font-size: 1.1rem; color: var(--text-sub); font-weight: 500; }
 
         .tempo-container { padding: 0 30px; }
         .tempo-card {
             background: var(--time-card-bg); color: #ffffff;
-            padding: 12px 20px; border-radius: 8px;
-            font-weight: 800; font-size: 1.8rem;
-            min-width: 130px; text-align: center;
+            padding: 12px 20px; border-radius: 10px;
+            font-weight: 800; font-size: 2rem;
+            min-width: 140px; text-align: center;
         }
 
         @media (max-width: 768px) {
             .header { padding: 15px 20px; }
-            #hora-atual { font-size: 2.2rem; }
+            .header-title { font-size: 1.3rem; }
+            #hora-atual { font-size: 2rem; }
             .destino-destaque { font-size: 1.2rem; }
-            .tempo-card { font-size: 1.3rem; min-width: 100px; }
+            .tempo-card { font-size: 1.4rem; min-width: 100px; }
         }
     </style>
 </head>
@@ -96,7 +107,12 @@
 <div class="header">
     <div class="header-left">
         <i class="material-icons">directions_bus</i>
-        <span class="header-title">Horários de Saída<br>📍 Estação Central</span>
+        <div class="title-group">
+            <span class="header-title">Horários de Saída</span>
+            <span class="header-subtitle">
+                <i class="material-icons pin">place</i> Estação Central
+            </span>
+        </div>
     </div>
     <div class="header-right">
         <span id="hora-atual">00:00</span>
@@ -105,7 +121,7 @@
 </div>
 
 <div id="lista-horarios" class="lista-horarios">
-    <div style="text-align:center; padding:50px; color:#999; font-size:1.5rem;">Sincronizando horários da Estação Central...</div>
+    <div style="text-align:center; padding:50px; color:#999; font-size:1.5rem;">Sincronizando horários em tempo real...</div>
 </div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
@@ -121,15 +137,10 @@ async function buscarProximasLinhas() {
     const ds = new google.maps.DirectionsService();
     const estaçãoCentral = new google.maps.LatLng(-19.5368231, -40.633973);
     
-    // Três destinos para cobrir todas as rotas de Colatina (Norte, Sul, Leste)
     const destinos = [
-        new google.maps.LatLng(-19.538218, -40.638288), 
-        new google.maps.LatLng(-19.543679, -40.635687), 
-        new google.maps.LatLng(-19.546150, -40.623582),
-        new google.maps.LatLng(-19.546150, -40.623582),
-        new google.maps.LatLng(-19.533517, -40.625750),
-        new google.maps.LatLng(-19.527216, -40.631712),
-        new google.maps.LatLng(-19.528290, -40.641906)
+        new google.maps.LatLng(-19.5300, -40.6300), 
+        new google.maps.LatLng(-19.5450, -40.6500), 
+        new google.maps.LatLng(-19.5200, -40.6100)  
     ];
 
     let promessas = destinos.map(destino => {
@@ -154,7 +165,6 @@ async function buscarProximasLinhas() {
         const step = rota.legs[0].steps.find(s => s.travel_mode === "TRANSIT");
         if (step && step.transit) {
             const t = step.transit;
-            // A chave única evita que a mesma linha apareça duplicada se servir para dois destinos
             const chaveUnica = `${t.line.short_name}-${t.departure_time.text}`;
             
             if (!linhasUnicas.has(chaveUnica)) {
@@ -169,7 +179,6 @@ async function buscarProximasLinhas() {
         }
     });
 
-    // Ordena pelo horário mais próximo e pega os 12 primeiros
     const listaFinal = Array.from(linhasUnicas.values())
         .sort((a, b) => a.timestamp - b.timestamp)
         .slice(0, 12);
@@ -180,7 +189,7 @@ async function buscarProximasLinhas() {
 function renderizarPainel(lista) {
     const container = document.getElementById('lista-horarios');
     if (lista.length === 0) {
-        container.innerHTML = "<div style='text-align:center; padding:50px; color:#999;'>Sem autocarros previstos para os próximos minutos.</div>";
+        container.innerHTML = "<div style='text-align:center; padding:50px; color:#999;'>Aguardando próximos horários...</div>";
         return;
     }
 
@@ -188,10 +197,9 @@ function renderizarPainel(lista) {
     lista.forEach(item => {
         const numeroApenas = parseInt(item.numero.replace(/\D/g, "")) || 0;
         
-        // Lógica de cores baseada na tua regra de numeração
-        let corEmpresa = "var(--vjd-color)"; // Joana D'arc (0-299)
+        let corEmpresa = "var(--vjd-color)"; 
         if (numeroApenas >= 300 && numeroApenas <= 499) {
-            corEmpresa = "var(--vsr-color)"; // São Roque (300-499)
+            corEmpresa = "var(--vsr-color)"; 
         }
 
         container.innerHTML += `
@@ -209,9 +217,8 @@ function renderizarPainel(lista) {
     });
 }
 
-// Inicialização e Timers
 setInterval(atualizarRelogio, 1000);
-setInterval(buscarProximasLinhas, 600000); // Atualiza a cada 10 minutos
+setInterval(buscarProximasLinhas, 600000); 
 
 window.onload = () => {
     atualizarRelogio();
@@ -220,7 +227,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
-
-
