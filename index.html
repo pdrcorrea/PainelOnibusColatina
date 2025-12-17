@@ -123,9 +123,13 @@ async function buscarProximasLinhas() {
     
     // Três destinos para cobrir todas as rotas de Colatina (Norte, Sul, Leste)
     const destinos = [
-        new google.maps.LatLng(-19.527519, -40.631984), 
-        new google.maps.LatLng(-19.537640, -40.633649), 
-        new google.maps.LatLng(-19.5200, -40.6100)  
+        new google.maps.LatLng(-19.538218, -40.638288), 
+        new google.maps.LatLng(-19.543679, -40.635687), 
+        new google.maps.LatLng(-19.546150, -40.623582),
+        new google.maps.LatLng(-19.546150, -40.623582),
+        new google.maps.LatLng(-19.533517, -40.625750),
+        new google.maps.LatLng(-19.527216, -40.631712),
+        new google.maps.LatLng(-19.528290, -40.641906)
     ];
 
     let promessas = destinos.map(destino => {
@@ -216,5 +220,6 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
 
