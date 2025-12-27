@@ -114,71 +114,47 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
 
-<script>
-let scrollInterval;
-
-function atualizarRelogio() {
-    const agora = new Date();
-    document.getElementById('hora-atual').textContent = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-    document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).toUpperCase();
-}
-
-function iniciarAutoScroll() {
-    const container = document.getElementById('lista-horarios');
-    if (scrollInterval) clearInterval(scrollInterval);
-
-    // Reinicia o topo sempre que os dados são recarregados
-    container.scrollTop = 0;
-
-    scrollInterval = setInterval(() => {
-        const fimDaPagina = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
-        
-        if (fimDaPagina) {
-            // Se chegou no fim, espera 5 segundos e volta pro topo suavemente
-            clearInterval(scrollInterval);
-            setTimeout(() => {
-                container.scrollTo({ top: 0, behavior: 'smooth' });
-                // Reinicia a rolagem após a animação de subida (1s)
-                setTimeout(iniciarAutoScroll, 1000);
-            }, 5000);
-        } else {
-            container.scrollTop += 1;
-        }
-    }, 40);
-}
-
-async function buscarDados() {
+async function buscarDadosReais() {
+    const estacaoCoord = new google.maps.LatLng(-19.5368231, -40.633973);
     const ds = new google.maps.DirectionsService();
-    const origem = new google.maps.LatLng(-19.5368231, -40.633973);
-    const destinosCoord = [
-        new google.maps.LatLng(-19.541771, -40.646423),
-        new google.maps.LatLng(-19.527449, -40.631921),
-        new google.maps.LatLng(-19.538495, -40.643410),
-        new google.maps.LatLng(-19.546694, -40.641236),
-        new google.maps.LatLng(-19.515336, -40.633971),
-        new google.maps.LatLng(-19.514306, -40.647369),
-        new google.maps.LatLng(-19.516321, -40.671053),
-        new google.maps.LatLng(-19.498648, -40.661442),
-        new google.maps.LatLng(-19.548751, -40.633611)
+    
+    // Lista de destinos "âncora" para forçar o Google a varrer todas as direções possíveis
+    // Aumentamos para 8 pontos cardeais para não escapar nenhuma linha
+    const anchors = [
+        {lat: -19.522, lng: -40.625}, {lat: -19.555, lng: -40.655},
+        {lat: -19.535, lng: -40.670}, {lat: -19.515, lng: -40.640},
+        {lat: -19.510, lng: -40.615}, {lat: -19.560, lng: -40.630},
+        {lat: -19.545, lng: -40.610}, {lat: -19.525, lng: -40.660}
     ];
 
-    let promessas = destinosCoord.map(loc => {
+    let todasRotas = [];
+
+    const promessas = anchors.map(ponto => {
         return new Promise((resolve) => {
             ds.route({
-                origin: origem, destination: loc,
-                travelMode: 'TRANSIT', transitOptions: { departureTime: new Date() },
+                origin: estacaoCoord,
+                destination: new google.maps.LatLng(ponto.lat, ponto.lng),
+                travelMode: 'TRANSIT',
+                transitOptions: { 
+                    departureTime: new Date(),
+                    routingPreference: 'FEWER_TRANSFERS' // Força a mostrar o ônibus direto
+                },
                 provideRouteAlternatives: true
-            }, (res, stat) => resolve(stat === 'OK' ? res.routes : []));
+            }, (res, stat) => {
+                if (stat === 'OK') resolve(res.routes);
+                else resolve([]);
+            });
         });
     });
 
     const resultados = await Promise.all(promessas);
-    let mapaAgrupado = new Map();
+    const mapaAgrupado = new Map();
 
     resultados.flat().forEach(rota => {
         const step = rota.legs[0].steps.find(s => s.transit);
         if (step && step.transit) {
             const t = step.transit;
+            // Chave baseada no número e no destino final (headsign)
             const chave = `${t.line.short_name}-${t.headsign}`;
 
             if (!mapaAgrupado.has(chave)) {
@@ -189,88 +165,45 @@ async function buscarDados() {
                     horarios: []
                 });
             }
+            
             const info = mapaAgrupado.get(chave);
-            if (!info.horarios.some(h => h.texto === t.departure_time.text)) {
-                info.horarios.push({ texto: t.departure_time.text, valor: t.departure_time.value });
+            const horaTexto = t.departure_time.text;
+            const horaValor = t.departure_time.value.getTime();
+
+            // Só adiciona se o horário for no futuro e não estiver duplicado
+            if (!info.horarios.some(h => h.texto === horaTexto)) {
+                info.horarios.push({ texto: horaTexto, valor: horaValor });
             }
         }
     });
 
-    renderizar(Array.from(mapaAgrupado.values()));
-}
+    // --- ORDENAÇÃO FINAL ---
+    const listaFinal = Array.from(mapaAgrupado.values()).sort((a, b) => {
+        // Pega o menor horário de cada card para comparar
+        const minA = Math.min(...a.horarios.map(h => h.valor));
+        const minB = Math.min(...b.horarios.map(h => h.valor));
 
-async function buscarDados() {
-    const ds = new google.maps.DirectionsService();
-    const origem = new google.maps.LatLng(-19.5368231, -40.633973);
-    const destinosCoord = [
-        new google.maps.LatLng(-19.541771, -40.646423),
-        new google.maps.LatLng(-19.527449, -40.631921),
-        new google.maps.LatLng(-19.538495, -40.643410),
-        new google.maps.LatLng(-19.546694, -40.641236)
-    ];
-
-    let promessas = destinosCoord.map(loc => {
-        return new Promise((resolve) => {
-            ds.route({
-                origin: origem, destination: loc,
-                travelMode: 'TRANSIT', transitOptions: { departureTime: new Date() },
-                provideRouteAlternatives: true
-            }, (res, stat) => resolve(stat === 'OK' ? res.routes : []));
-        });
+        if (minA !== minB) return minA - minB; // Ordem cronológica
+        return parseInt(a.numero) - parseInt(b.numero); // Desempate por número da linha
     });
 
-    const resultados = await Promise.all(promessas);
-    let mapaAgrupado = new Map();
-
-    resultados.flat().forEach(rota => {
-        const step = rota.legs[0].steps.find(s => s.transit);
-        if (step && step.transit) {
-            const t = step.transit;
-            const chave = `${t.line.short_name}-${t.headsign}`;
-
-            if (!mapaAgrupado.has(chave)) {
-                mapaAgrupado.set(chave, {
-                    numero: t.line.short_name,
-                    destino: t.headsign,
-                    nomeLinha: t.line.name,
-                    horarios: []
-                });
-            }
-            const info = mapaAgrupado.get(chave);
-            if (!info.horarios.some(h => h.texto === t.departure_time.text)) {
-                info.horarios.push({ texto: t.departure_time.text, valor: t.departure_time.value });
-            }
-        }
-    });
-
-    // --- LÓGICA DE ORDENAÇÃO DOS CARDS ---
-    const listaOrdenada = Array.from(mapaAgrupado.values()).sort((a, b) => {
-        // Ordena cada grupo de horários interno primeiro para pegar o menor
-        const menorA = Math.min(...a.horarios.map(h => h.valor));
-        const menorB = Math.min(...b.horarios.map(h => h.valor));
-
-        // 1. Comparar pelo horário mais próximo
-        if (menorA !== menorB) {
-            return menorA - menorB;
-        }
-        // 2. Desempate pelo número da linha (Convertendo para número para 010 vir antes de 020)
-        return parseInt(a.numero) - parseInt(b.numero);
-    });
-
-    renderizar(listaOrdenada);
+    renderizar(listaFinal);
 }
 
 function renderizar(dados) {
     const container = document.getElementById('lista-horarios');
-    if (dados.length === 0) return;
+    if (dados.length === 0) {
+        container.innerHTML = `<div style="color:white; text-align:center; padding:50px;">Buscando linhas...</div>`;
+        return;
+    }
 
     container.innerHTML = dados.map(item => {
-        // Ordena os horários dentro das pílulas também
+        // Ordena os horários dentro das pílulas
         const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
         const n = parseInt(item.numero) || 0;
-        const ehSaoRoque = (n >= 300 && n <= 499);
-        const cor = ehSaoRoque ? "var(--vsr-color)" : "var(--vjd-color)";
-        const sigla = ehSaoRoque ? "VSR" : "VJD";
+        const ehSR = (n >= 300 && n <= 499);
+        const cor = ehSR ? "var(--vsr-color)" : "var(--vjd-color)";
+        const sigla = ehSR ? "VSR" : "VJD";
 
         return `
             <div class="linha-item">
@@ -292,15 +225,13 @@ function renderizar(dados) {
             </div>`;
     }).join('');
 
-    setTimeout(iniciarAutoScroll, 1000);
+    // Garante volta ao topo e inicia scroll
+    container.scrollTop = 0;
+    setTimeout(iniciarAutoScroll, 2000);
 }
-
-setInterval(atualizarRelogio, 1000);
-setInterval(buscarDados, 600000);
-window.onload = () => { atualizarRelogio(); buscarDados(); };
-</script>
 </body>
 </html>
+
 
 
 
