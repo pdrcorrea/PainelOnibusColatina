@@ -75,7 +75,7 @@
         .numero-box { padding: 0 25px; font-size: 3.2rem; font-weight: 900; color: #222; min-width: 100px; text-align: center; }
 
         .detalhes { flex-grow: 1; padding: 10px 0; overflow: hidden; }
-        .destino-texto { font-weight: 900; font-size: 2rem; text-transform: uppercase; color: #1a1a1a; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .destino-texto { font-weight: 900; font-size: 1.9rem; text-transform: uppercase; color: #1a1a1a; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .linha-info-container { display: flex; align-items: center; gap: 8px; }
         .empresa-badge { font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; color: white; text-transform: uppercase; }
@@ -100,7 +100,7 @@
     <div class="header-left">
         <i class="material-icons">directions_bus</i>
         <div class="title-group">
-            <span class="header-title">Horários de Saída</span>
+            <span class="header-title">Painel de Horários</span>
             <span class="header-subtitle"><i class="material-icons">place</i> Estação Central</span>
         </div>
     </div>
@@ -112,27 +112,30 @@
 
 <div id="lista-horarios" class="lista-horarios"></div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8"></script>
 
-<script
-// Substitua todo o seu script por este:
+<script>
+let scrollInterval;
 let mapaAgrupado = new Map();
+
+function atualizarRelogio() {
+    const agora = new Date();
+    document.getElementById('hora-atual').textContent = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+    document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).toUpperCase();
+}
 
 async function buscarDados() {
     const estacaoCoord = { lat: -19.5368231, lng: -40.633973 };
     const ds = new google.maps.DirectionsService();
-    
-    // Limpamos para nova busca
     mapaAgrupado.clear();
 
-    // Criamos 12 pontos em um círculo perfeito ao redor da estação (raio de 3km)
-    // Isso força o Google a encontrar TODAS as linhas que saem do centro em qualquer direção
+    // Cria 12 destinos ao redor da estação para cobrir todas as saídas
     const pontosBusca = [];
     for (let i = 0; i < 12; i++) {
         const angulo = (i * 30) * (Math.PI / 180);
         pontosBusca.push({
-            lat: estacaoCoord.lat + (0.03 * Math.PI / 180) * Math.sin(angulo),
-            lng: estacaoCoord.lng + (0.03 * Math.PI / 180) * Math.cos(angulo)
+            lat: estacaoCoord.lat + 0.03 * Math.sin(angulo),
+            lng: estacaoCoord.lng + 0.03 * Math.cos(angulo)
         });
     }
 
@@ -142,32 +145,22 @@ async function buscarDados() {
                 origin: estacaoCoord,
                 destination: ponto,
                 travelMode: 'TRANSIT',
-                transitOptions: { 
-                    departureTime: new Date(),
-                    routingPreference: 'FEWER_TRANSFERS'
-                },
+                transitOptions: { departureTime: new Date(), routingPreference: 'FEWER_TRANSFERS' },
                 provideRouteAlternatives: true
             }, (res, stat) => {
-                if (stat === 'OK') {
-                    processarRotas(res.routes);
-                    resolve();
-                } else {
-                    resolve();
-                }
+                if (stat === 'OK') processarRotas(res.routes);
+                resolve();
             });
         });
     });
 
     await Promise.all(promessas);
-    const listaOrdenada = ordenarDados();
-    renderizar(listaOrdenada);
+    renderizar(ordenarDados());
 }
 
 function processarRotas(routes) {
     routes.forEach(rota => {
-        const leg = rota.legs[0];
-        const step = leg.steps.find(s => s.transit);
-        
+        const step = rota.legs[0].steps.find(s => s.transit);
         if (step && step.transit) {
             const t = step.transit;
             const numero = t.line.short_name || t.line.name.split(' ')[0];
@@ -181,13 +174,9 @@ function processarRotas(routes) {
                     horarios: []
                 });
             }
-
             const info = mapaAgrupado.get(chave);
-            const horaTexto = t.departure_time.text;
-            const horaValor = t.departure_time.value.getTime();
-
-            if (!info.horarios.some(h => h.texto === horaTexto)) {
-                info.horarios.push({ texto: horaTexto, valor: horaValor });
+            if (!info.horarios.some(h => h.texto === t.departure_time.text)) {
+                info.horarios.push({ texto: t.departure_time.text, valor: t.departure_time.value.getTime() });
             }
         }
     });
@@ -197,9 +186,7 @@ function ordenarDados() {
     return Array.from(mapaAgrupado.values()).sort((a, b) => {
         const minA = Math.min(...a.horarios.map(h => h.valor));
         const minB = Math.min(...b.horarios.map(h => h.valor));
-
         if (minA !== minB) return minA - minB;
-        // Ordenação numérica para linhas (ex: 10, 20, 110...)
         return a.numero.localeCompare(b.numero, undefined, {numeric: true});
     });
 }
@@ -207,12 +194,12 @@ function ordenarDados() {
 function renderizar(dados) {
     const container = document.getElementById('lista-horarios');
     if (dados.length === 0) {
-        container.innerHTML = `<div style="color:white; text-align:center; padding:50px; font-size:1.5rem;">Aguardando dados do Google Maps...</div>`;
+        container.innerHTML = `<div style="color:#666; text-align:center; padding:50px; font-size:1.5rem;">Sincronizando com Google Maps...</div>`;
         return;
     }
 
     container.innerHTML = dados.map(item => {
-        const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
+        const hOrd = item.horarios.sort((a,b) => a.valor - b.valor);
         const n = parseInt(item.numero) || 0;
         const ehSR = (n >= 300 && n <= 499);
         const cor = ehSR ? "var(--vsr-color)" : "var(--vjd-color)";
@@ -230,9 +217,9 @@ function renderizar(dados) {
                     </div>
                 </div>
                 <div class="tempo-container">
-                    <div class="tempo-destaque">${hOrdenados[0].texto}</div>
+                    <div class="tempo-destaque">${hOrd[0].texto}</div>
                     <div class="lista-proximos">
-                        ${hOrdenados.slice(1, 4).map(f => `<div class="pila-horario">${f.texto}</div>`).join('')}
+                        ${hOrd.slice(1, 4).map(f => `<div class="pila-horario">${f.texto}</div>`).join('')}
                     </div>
                 </div>
             </div>`;
@@ -241,12 +228,28 @@ function renderizar(dados) {
     container.scrollTop = 0;
     setTimeout(iniciarAutoScroll, 2000);
 }
-></script>
+
+function iniciarAutoScroll() {
+    const container = document.getElementById('lista-horarios');
+    if (scrollInterval) clearInterval(scrollInterval);
+    
+    scrollInterval = setInterval(() => {
+        const fim = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
+        if (fim) {
+            clearInterval(scrollInterval);
+            setTimeout(() => {
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(iniciarAutoScroll, 1000);
+            }, 5000);
+        } else {
+            container.scrollTop += 1;
+        }
+    }, 40);
+}
+
+setInterval(atualizarRelogio, 1000);
+setInterval(buscarDados, 600000);
+window.onload = () => { atualizarRelogio(); buscarDados(); };
+</script>
 </body>
 </html>
-
-
-
-
-
-
