@@ -198,11 +198,73 @@ async function buscarDados() {
     renderizar(Array.from(mapaAgrupado.values()));
 }
 
+async function buscarDados() {
+    const ds = new google.maps.DirectionsService();
+    const origem = new google.maps.LatLng(-19.5368231, -40.633973);
+    const destinosCoord = [
+        new google.maps.LatLng(-19.541771, -40.646423),
+        new google.maps.LatLng(-19.527449, -40.631921),
+        new google.maps.LatLng(-19.538495, -40.643410),
+        new google.maps.LatLng(-19.546694, -40.641236)
+    ];
+
+    let promessas = destinosCoord.map(loc => {
+        return new Promise((resolve) => {
+            ds.route({
+                origin: origem, destination: loc,
+                travelMode: 'TRANSIT', transitOptions: { departureTime: new Date() },
+                provideRouteAlternatives: true
+            }, (res, stat) => resolve(stat === 'OK' ? res.routes : []));
+        });
+    });
+
+    const resultados = await Promise.all(promessas);
+    let mapaAgrupado = new Map();
+
+    resultados.flat().forEach(rota => {
+        const step = rota.legs[0].steps.find(s => s.transit);
+        if (step && step.transit) {
+            const t = step.transit;
+            const chave = `${t.line.short_name}-${t.headsign}`;
+
+            if (!mapaAgrupado.has(chave)) {
+                mapaAgrupado.set(chave, {
+                    numero: t.line.short_name,
+                    destino: t.headsign,
+                    nomeLinha: t.line.name,
+                    horarios: []
+                });
+            }
+            const info = mapaAgrupado.get(chave);
+            if (!info.horarios.some(h => h.texto === t.departure_time.text)) {
+                info.horarios.push({ texto: t.departure_time.text, valor: t.departure_time.value });
+            }
+        }
+    });
+
+    // --- LÓGICA DE ORDENAÇÃO DOS CARDS ---
+    const listaOrdenada = Array.from(mapaAgrupado.values()).sort((a, b) => {
+        // Ordena cada grupo de horários interno primeiro para pegar o menor
+        const menorA = Math.min(...a.horarios.map(h => h.valor));
+        const menorB = Math.min(...b.horarios.map(h => h.valor));
+
+        // 1. Comparar pelo horário mais próximo
+        if (menorA !== menorB) {
+            return menorA - menorB;
+        }
+        // 2. Desempate pelo número da linha (Convertendo para número para 010 vir antes de 020)
+        return parseInt(a.numero) - parseInt(b.numero);
+    });
+
+    renderizar(listaOrdenada);
+}
+
 function renderizar(dados) {
     const container = document.getElementById('lista-horarios');
     if (dados.length === 0) return;
 
     container.innerHTML = dados.map(item => {
+        // Ordena os horários dentro das pílulas também
         const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
         const n = parseInt(item.numero) || 0;
         const ehSaoRoque = (n >= 300 && n <= 499);
@@ -229,7 +291,6 @@ function renderizar(dados) {
             </div>`;
     }).join('');
 
-    // Pequeno delay para garantir que o DOM renderizou antes de calcular o scroll
     setTimeout(iniciarAutoScroll, 1000);
 }
 
@@ -239,4 +300,5 @@ window.onload = () => { atualizarRelogio(); buscarDados(); };
 </script>
 </body>
 </html>
+
 
