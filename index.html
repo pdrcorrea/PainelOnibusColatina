@@ -8,54 +8,231 @@
     <style>
         :root {
             --bg-body: #ffffff;
-            --header-accent: #ffd700;
+            --header-bg: #1a1a1a; /* Tom mais escuro para o cabeçalho */
+            --header-text: #ffffff;
+            --header-accent: #ffd700; /* Amarelo do ícone e hora */
             --card-bg: #f8f9fa;
             --card-border: #e0e0e0;
-            --vjd-color: #0056b3; 
-            --vsr-color: #00bfff; 
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --vjd-color: #0056b3; /* Azul Joana D'arc */
+            --vsr-color: #00bfff; /* Verde São Roque */
             --time-card-bg: #27ae60;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; background: var(--bg-body); }
-
-        /* CABEÇALHO COM IMAGEM DE FUNDO */
-        .header { 
-            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://ibb.co/QjC6YvhB');
-            background-size: cover;
-            background-position: center;
-            padding: 20px 40px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border-bottom: 4px solid var(--header-accent);
+        body { 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; padding: 0;
+            overflow: hidden;
         }
+
+        /* Cabeçalho inspirado na imagem enviada */
+        .header { 
+            background: var(--header-bg); 
+            padding: 15px 40px; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-left i { font-size: 48px; color: var(--header-accent); }
+        
+        .title-group { display: flex; flex-direction: column; }
         .header-title { 
-            font-size: 2rem; font-weight: 900; text-transform: uppercase; color: #ffffff; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1; 
+            font-size: 1.8rem; font-weight: 900; text-transform: uppercase; 
+            letter-spacing: 1px; color: var(--header-text); line-height: 1;
         }
         .header-subtitle { 
-            font-size: 1rem; color: #e0e0e0; text-transform: uppercase; display: flex; 
-            align-items: center; gap: 8px; margin-top: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            font-size: 0.95rem; font-weight: 600; color: #a0a0a0; 
+            text-transform: uppercase; margin-top: 5px; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 5px;
         }
-        .header-subtitle i { color: var(--header-accent) !important; }
-        #hora-atual { 
-            font-size: 3.5rem; font-weight: 800; color: var(--header-accent); 
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.5); line-height: 1; 
+        .header-subtitle .pin { color: #ff4d4d; font-size: 16px; }
+
+        .header-right { text-align: right; }
+        #hora-atual { font-size: 3rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; }
+        #data-atual { font-size: 0.9rem; color: #888; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+
+        /* Lista de Horários */
+        .lista-horarios { 
+            height: calc(100vh - 100px);
+            overflow-y: auto; padding: 25px 40px;
+            box-sizing: border-box;
         }
 
-        /* LAYOUT E ANÚNCIOS */
-        .container-principal { display: flex; height: calc(100vh - 125px); }
-        .lista-horarios { flex: 3; overflow-y: auto; padding: 25px 40px; }
-        .linha-item { background: var(--card-bg); margin-bottom: 12px; display: flex; align-items: center; border-radius: 12px; border: 1px solid var(--card-border); overflow: hidden; }
-        .indicador-empresa { width: 12px; height: 80px; }
-        .numero-box { padding: 0 20px; font-size: 30px; font-weight: 900; min-width: 80px; text-align: center; }
-        .tempo-card { background: var(--time-card-bg); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 1.8rem; margin-right: 20px; }
-        .barra-anuncios { flex: 1; background: #f4f4f4; border-left: 3px solid var(--header-accent); padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .anuncio-box { background: white; border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; width: 100%; }
+        .linha-item { 
+            background: var(--card-bg); margin-bottom: 15px;
+            display: flex; align-items: center;
+            border-radius: 12px; overflow: hidden;
+            border: 1px solid var(--card-border); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .indicador-empresa { width: 15px; height: 95px; flex-shrink: 0; }
+
+        .numero-box { 
+            padding: 0 20px; font-size: 34px; font-weight: 900;
+            color: var(--text-main); min-width: 100px; text-align: center;
+        }
+
+        .detalhes { flex-grow: 1; padding: 15px 0; overflow: hidden; }
+        .destino-destaque { 
+            font-weight: 800; font-size: 1.8rem; 
+            text-transform: uppercase; color: var(--text-main);
+            margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .nome-linha-sub { font-size: 1.1rem; color: var(--text-sub); font-weight: 500; }
+
+        .tempo-container { padding: 0 30px; }
+        .tempo-card {
+            background: var(--time-card-bg); color: #ffffff;
+            padding: 12px 20px; border-radius: 10px;
+            font-weight: 800; font-size: 2rem;
+            min-width: 140px; text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; }
+            .header-title { font-size: 1.3rem; }
+            #hora-atual { font-size: 2rem; }
+            .destino-destaque { font-size: 1.2rem; }
+            .tempo-card { font-size: 1.4rem; min-width: 100px; }
+        }
     </style>
 </head>
 <body>
-    </body>
+
+<div class="header">
+    <div class="header-left">
+        <i class="material-icons">directions_bus</i>
+        <div class="title-group">
+            <span class="header-title">Horários de Saída</span>
+            <span class="header-subtitle">
+                <i class="material-icons pin">place</i> Estação Central
+            </span>
+        </div>
+    </div>
+    <div class="header-right">
+        <span id="hora-atual">00:00</span>
+        <div id="data-atual">-- -- ----</div>
+    </div>
+</div>
+
+<div id="lista-horarios" class="lista-horarios">
+    <div style="text-align:center; padding:50px; color:#999; font-size:1.5rem;">Sincronizando horários em tempo real...</div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
+
+<script>
+function atualizarRelogio() {
+    const agora = new Date();
+    document.getElementById('hora-atual').textContent = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+    document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+}
+
+async function buscarProximasLinhas() {
+    const ds = new google.maps.DirectionsService();
+    const estaçãoCentral = new google.maps.LatLng(-19.5368231, -40.633973);
+    
+    const destinos = [
+        new google.maps.LatLng(-19.541771, -40.646423), 
+        new google.maps.LatLng(-19.546694, -40.641236), 
+        new google.maps.LatLng(-19.544018, -40.635607),
+        new google.maps.LatLng(-19.537705, -40.630154),
+        new google.maps.LatLng(-19.534197, -40.626624),
+        new google.maps.LatLng(-19.527449, -40.631921),
+        new google.maps.LatLng(-19.538495, -40.643410)
+    ];
+
+    let promessas = destinos.map(destino => {
+        return new Promise((resolve) => {
+            ds.route({
+                origin: estaçãoCentral,
+                destination: destino,
+                travelMode: google.maps.TravelMode.TRANSIT,
+                transitOptions: { departureTime: new Date(), modes: ['BUS'] },
+                provideRouteAlternatives: true
+            }, (response, status) => {
+                if (status === 'OK') resolve(response.routes);
+                else resolve([]);
+            });
+        });
+    });
+
+    const resultados = await Promise.all(promessas);
+    let linhasUnicas = new Map();
+
+    resultados.flat().forEach(rota => {
+        const step = rota.legs[0].steps.find(s => s.travel_mode === "TRANSIT");
+        if (step && step.transit) {
+            const t = step.transit;
+            const chaveUnica = `${t.line.short_name}-${t.departure_time.text}`;
+            
+            if (!linhasUnicas.has(chaveUnica)) {
+                linhasUnicas.set(chaveUnica, {
+                    numero: t.line.short_name || "---",
+                    destino: t.headsign,
+                    nomeLinha: t.line.name,
+                    horaSaida: t.departure_time.text,
+                    timestamp: t.departure_time.value
+                });
+            }
+        }
+    });
+
+    const listaFinal = Array.from(linhasUnicas.values())
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .slice(0, 12);
+
+    renderizarPainel(listaFinal);
+}
+
+function renderizarPainel(lista) {
+    const container = document.getElementById('lista-horarios');
+    if (lista.length === 0) {
+        container.innerHTML = "<div style='text-align:center; padding:50px; color:#999;'>Aguardando próximos horários...</div>";
+        return;
+    }
+
+    container.innerHTML = "";
+    lista.forEach(item => {
+        const numeroApenas = parseInt(item.numero.replace(/\D/g, "")) || 0;
+        
+        let corEmpresa = "var(--vjd-color)"; 
+        if (numeroApenas >= 300 && numeroApenas <= 499) {
+            corEmpresa = "var(--vsr-color)"; 
+        }
+
+        container.innerHTML += `
+            <div class="linha-item">
+                <div class="indicador-empresa" style="background: ${corEmpresa}"></div>
+                <div class="numero-box">${item.numero}</div>
+                <div class="detalhes">
+                    <div class="destino-destaque">${item.destino}</div>
+                    <div class="nome-linha-sub">Linha: ${item.nomeLinha}</div>
+                </div>
+                <div class="tempo-container">
+                    <div class="tempo-card">${item.horaSaida}</div>
+                </div>
+            </div>`;
+    });
+}
+
+setInterval(atualizarRelogio, 1000);
+setInterval(buscarProximasLinhas, 600000); 
+
+window.onload = () => {
+    atualizarRelogio();
+    buscarProximasLinhas();
+};
+</script>
+</body>
 </html>
+
+
+
+
 
