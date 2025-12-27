@@ -75,32 +75,50 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.08);
         }
 
-        /* Barra lateral fixa e elegante */
+        /* Barra lateral fina e constante */
         .indicador-empresa { 
-            width: 10px; 
-            align-self: stretch; /* Garante que a barra ocupe toda a altura do card */
+            width: 8px; 
+            align-self: stretch; 
             flex-shrink: 0;
         }
 
-        /* Box do Número com identificação da empresa */
-        .numero-box-container {
+        /* Box do Número limpo e centralizado */
+        .numero-box { 
+            padding: 0 25px; 
+            font-size: 3.2rem; 
+            font-weight: 900; 
+            color: #222; 
+            min-width: 100px; 
+            text-align: center;
+            line-height: 1;
+        }
+
+        .detalhes { flex-grow: 1; padding: 10px 0; overflow: hidden; }
+        
+        .destino-texto { 
+            font-weight: 900; font-size: 1.9rem; text-transform: uppercase; 
+            color: #1a1a1a; margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* Container da Linha com o Badge */
+        .linha-info-container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 0 15px;
-            min-width: 90px;
-            gap: 5px;
+            gap: 8px;
         }
 
         .empresa-badge {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
             padding: 2px 8px;
             border-radius: 4px;
             color: white;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
+        .linha-sub { font-size: 1.1rem; color: var(--text-sub); font-weight: 600; }
 
         .numero-box { 
             font-size: 2.8rem; 
@@ -275,14 +293,14 @@ function renderizar(dados) {
             <div class="linha-item">
                 <div class="indicador-empresa" style="background: ${cor}"></div>
                 
-                <div class="numero-box-container">
-                    <div class="empresa-badge" style="background: ${cor}">${siglaEmpresa}</div>
-                    <div class="numero-box">${item.numero}</div>
-                </div>
+                <div class="numero-box">${item.numero}</div>
 
                 <div class="detalhes">
                     <div class="destino-texto">${item.destino}</div>
-                    <div class="linha-sub">Linha: ${item.nomeLinha}</div>
+                    <div class="linha-info-container">
+                        <span class="empresa-badge" style="background: ${cor}">${siglaEmpresa}</span>
+                        <span class="linha-sub">Linha: ${item.nomeLinha}</span>
+                    </div>
                 </div>
 
                 <div class="tempo-container">
@@ -303,6 +321,7 @@ window.onload = () => { atualizarRelogio(); buscarDados(); };
 </script>
 </body>
 </html>
+
 
 
 
