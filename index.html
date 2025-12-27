@@ -78,22 +78,49 @@
         }
         .linha-sub { font-size: 1.1rem; color: var(--text-sub); font-weight: 600; }
 
-        .tempo-container { display: flex; align-items: center; gap: 15px; padding-right: 30px; }
+        /* Ajuste do Container de Tempo para alinhamento vertical */
+        .tempo-container { 
+            display: flex; 
+            flex-direction: column; /* Alinha itens um abaixo do outro */
+            align-items: center; 
+            gap: 10px; 
+            padding-right: 30px; 
+            min-width: 150px;
+        }
         
         .tempo-destaque {
-            background: var(--time-highlight); color: #ffffff;
-            padding: 12px 22px; border-radius: 12px;
-            font-weight: 900; font-size: 2.6rem;
-            min-width: 130px; text-align: center;
+            background: var(--time-highlight); 
+            color: #ffffff;
+            padding: 10px 20px; 
+            border-radius: 12px;
+            font-weight: 900; 
+            font-size: 2.8rem;
+            width: 100%; /* Ocupa a largura do container */
+            text-align: center;
             box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+            line-height: 1;
         }
 
-        .lista-proximos { display: flex; flex-direction: column; gap: 4px; }
+        /* Próximos horários agora em linha horizontal abaixo do verde */
+        .lista-proximos { 
+            display: flex; 
+            flex-direction: row; /* Mantém os horários menores lado a lado */
+            gap: 6px; 
+            justify-content: center;
+            width: 100%;
+        }
+
         .pila-horario {
-            background: #e9ecef; color: #495057;
-            padding: 3px 10px; border-radius: 6px;
-            font-weight: 700; font-size: 1rem;
-            text-align: center; border: 1px solid #dee2e6;
+            background: #e9ecef; 
+            color: #495057;
+            padding: 4px 8px; 
+            border-radius: 6px;
+            font-weight: 700; 
+            font-size: 1rem;
+            flex: 1; /* Distribui o espaço entre eles */
+            text-align: center; 
+            border: 1px solid #dee2e6;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -197,7 +224,7 @@ function renderizar(dados) {
     container.innerHTML = dados.map(item => {
         const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
         const proximo = hOrdenados[0];
-        const futuros = hOrdenados.slice(1, 4);
+        const futuros = hOrdenados.slice(1, 4); // Pega até 3 próximos
         
         const n = parseInt(item.numero) || 0;
         const cor = (n >= 300 && n <= 499) ? "var(--vsr-color)" : "var(--vjd-color)";
@@ -211,7 +238,7 @@ function renderizar(dados) {
                     <div class="linha-sub">Linha: ${item.nomeLinha}</div>
                 </div>
                 <div class="tempo-container">
-                    <div class="tempo-destaque">${proximo.texto}</div>
+                    <div class="tempo-destaque">${proximo ? proximo.texto : '--:--'}</div>
                     <div class="lista-proximos">
                         ${futuros.map(f => `<div class="pila-horario">${f.texto}</div>`).join('')}
                     </div>
@@ -228,3 +255,4 @@ window.onload = () => { atualizarRelogio(); buscarDados(); };
 </script>
 </body>
 </html>
+
