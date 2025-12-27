@@ -15,19 +15,19 @@
             --text-sub: #666666;
             --vjd-color: #0056b3; 
             --vsr-color: #00bfff; 
-            --time-card-bg: #27ae60;
+            --time-highlight: #27ae60;
         }
 
         body { 
             background: var(--bg-body); 
             font-family: 'Segoe UI', Roboto, sans-serif; 
             margin: 0; padding: 0;
-            overflow: hidden; /* Impede a barra de rolagem manual de aparecer */
+            overflow: hidden;
         }
 
-        /* CABEÇALHO MODERNO (INSPIRADO NA IMAGEM) */
+        /* CABEÇALHO COM SUA IMAGEM AZUL */
         .header { 
-            background-image: linear-gradient(to right, rgba(0, 32, 96, 0.9), rgba(0, 112, 192, 0.7)), url('https://ibb.co/QjC6YvhB');
+            background-image: linear-gradient(to right, rgba(0, 32, 96, 0.85), rgba(0, 112, 192, 0.7)), url('https://ibb.co/QjC6YvhB');
             background-size: cover;
             background-position: center;
             padding: 20px 50px; 
@@ -35,69 +35,65 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             border-bottom: 4px solid var(--header-accent);
             color: white;
-            position: relative;
             z-index: 10;
         }
 
         .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-left i.bus-icon { font-size: 50px; color: white; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3)); }
+        .header-left i { font-size: 45px; color: white; }
         
         .title-group { display: flex; flex-direction: column; }
-        .header-title { 
-            font-size: 2.2rem; font-weight: 900; text-transform: uppercase; 
-            letter-spacing: 2px; line-height: 1; margin: 0;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-        .header-subtitle { 
-            font-size: 1.1rem; font-weight: 600; color: #f0f0f0; 
-            text-transform: uppercase; margin-top: 8px;
-            display: flex; align-items: center; gap: 5px;
-        }
+        .header-title { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; line-height: 1; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .header-subtitle { font-size: 1.1rem; font-weight: 600; color: #f0f0f0; text-transform: uppercase; margin-top: 8px; display: flex; align-items: center; gap: 5px; }
         .header-subtitle .pin { color: var(--header-accent); font-size: 20px; }
 
         .header-right { text-align: right; background: rgba(255, 255, 255, 0.1); padding: 10px 25px; border-radius: 15px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); }
-        #hora-atual { font-size: 3.5rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        #data-atual { font-size: 0.9rem; color: #ffffff; text-transform: uppercase; margin-top: 5px; font-weight: 700; letter-spacing: 1px; }
+        #hora-atual { font-size: 3.5rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; }
 
-        /* LISTA COM ROLAGEM AUTOMÁTICA */
+        /* LISTA E CARDS */
         .lista-horarios { 
-            height: calc(100vh - 140px);
-            overflow-y: hidden; /* O JS cuidará da rolagem */
-            padding: 30px 50px;
+            height: calc(100vh - 145px);
+            overflow-y: hidden;
+            padding: 25px 50px;
             box-sizing: border-box;
             scroll-behavior: smooth;
         }
 
         .linha-item { 
-            background: var(--card-bg); margin-bottom: 20px;
+            background: var(--card-bg); margin-bottom: 18px;
             display: flex; align-items: center;
             border-radius: 15px; overflow: hidden;
             border: 1px solid var(--card-border); 
             box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
         }
 
-        .indicador-empresa { width: 18px; height: 110px; flex-shrink: 0; }
+        .indicador-empresa { width: 18px; height: 115px; flex-shrink: 0; }
 
-        .numero-box { 
-            padding: 0 25px; font-size: 40px; font-weight: 900;
-            color: #333; min-width: 110px; text-align: center;
+        .numero-box { padding: 0 25px; font-size: 38px; font-weight: 900; color: #333; min-width: 100px; text-align: center; }
+
+        .detalhes { flex-grow: 1; padding: 10px 0; overflow: hidden; }
+        .destino-texto { 
+            font-weight: 900; font-size: 1.9rem; text-transform: uppercase; 
+            color: #1a1a1a; margin-bottom: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .linha-sub { font-size: 1.1rem; color: var(--text-sub); font-weight: 600; }
+
+        .tempo-container { display: flex; align-items: center; gap: 15px; padding-right: 30px; }
+        
+        .tempo-destaque {
+            background: var(--time-highlight); color: #ffffff;
+            padding: 12px 22px; border-radius: 12px;
+            font-weight: 900; font-size: 2.6rem;
+            min-width: 130px; text-align: center;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
         }
 
-        .detalhes { flex-grow: 1; padding: 15px 10px; }
-        .destino-destaque { 
-            font-weight: 800; font-size: 2.2rem; 
-            text-transform: uppercase; color: #1a1a1a;
-            margin-bottom: 5px;
-        }
-        .nome-linha-sub { font-size: 1.2rem; color: var(--text-sub); font-weight: 600; }
-
-        .tempo-card {
-            background: var(--time-card-bg); color: #ffffff;
-            padding: 15px 30px; border-radius: 12px;
-            font-weight: 800; font-size: 2.5rem;
-            margin-right: 30px; min-width: 160px; text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        .lista-proximos { display: flex; flex-direction: column; gap: 4px; }
+        .pila-horario {
+            background: #e9ecef; color: #495057;
+            padding: 3px 10px; border-radius: 6px;
+            font-weight: 700; font-size: 1rem;
+            text-align: center; border: 1px solid #dee2e6;
         }
     </style>
 </head>
@@ -105,23 +101,20 @@
 
 <div class="header">
     <div class="header-left">
-        <i class="material-icons bus-icon">directions_bus</i>
+        <i class="material-icons">directions_bus</i>
         <div class="title-group">
             <span class="header-title">Horários de Saída</span>
-            <span class="header-subtitle">
-                <i class="material-icons pin">place</i> Estação Central
-            </span>
+            <span class="header-subtitle"><i class="material-icons pin">place</i> Estação Central</span>
         </div>
     </div>
     <div class="header-right">
         <span id="hora-atual">00:00</span>
-        <div id="data-atual">Carregando...</div>
+        <div id="data-atual" style="color: white; font-size: 0.9rem; font-weight: 700;"></div>
     </div>
 </div>
 
 <div id="lista-horarios" class="lista-horarios">
-    <div style="text-align:center; padding:100px; color:#999; font-size:2rem;">Iniciando sistema...</div>
-</div>
+    </div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
 
@@ -134,25 +127,20 @@ function atualizarRelogio() {
     document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).toUpperCase();
 }
 
-// FUNÇÃO DE ROLAGEM AUTOMÁTICA
 function iniciarAutoScroll() {
     const container = document.getElementById('lista-horarios');
     if (scrollInterval) clearInterval(scrollInterval);
-
     scrollInterval = setInterval(() => {
         if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
-            // Se chegou no fim, volta para o topo suavemente após uma pausa
-            setTimeout(() => { container.scrollTop = 0; }, 3000);
-        } else {
-            container.scrollTop += 1; // Velocidade da rolagem (aumente para ser mais rápido)
-        }
-    }, 30); // Frequência da atualização
+            setTimeout(() => { container.scrollTop = 0; }, 4000);
+        } else { container.scrollTop += 1; }
+    }, 40);
 }
 
-async function buscarProximasLinhas() {
+async function buscarDados() {
     const ds = new google.maps.DirectionsService();
-    const estaçãoCentral = new google.maps.LatLng(-19.5368231, -40.633973);
-    const destinos = [
+    const origem = new google.maps.LatLng(-19.5368231, -40.633973);
+    const destinosCoord = [
         new google.maps.LatLng(-19.541771, -40.646423), 
         new google.maps.LatLng(-19.546694, -40.641236), 
         new google.maps.LatLng(-19.544018, -40.635607),
@@ -162,59 +150,72 @@ async function buscarProximasLinhas() {
         new google.maps.LatLng(-19.538495, -40.643410)
     ];
 
-    let promessas = destinos.map(destino => {
+    let promessas = destinosCoord.map(loc => {
         return new Promise((resolve) => {
             ds.route({
-                origin: estaçãoCentral,
-                destination: destino,
-                travelMode: 'TRANSIT',
-                transitOptions: { departureTime: new Date() },
+                origin: origem, destination: loc,
+                travelMode: 'TRANSIT', transitOptions: { departureTime: new Date() },
                 provideRouteAlternatives: true
-            }, (response, status) => {
-                resolve(status === 'OK' ? response.routes : []);
-            });
+            }, (res, stat) => resolve(stat === 'OK' ? res.routes : []));
         });
     });
 
     const resultados = await Promise.all(promessas);
-    let linhasUnicas = new Map();
+    let mapaAgrupado = new Map();
 
     resultados.flat().forEach(rota => {
         const step = rota.legs[0].steps.find(s => s.transit);
         if (step && step.transit) {
             const t = step.transit;
-            const chave = `${t.line.short_name}-${t.departure_time.text}`;
-            if (!linhasUnicas.has(chave)) {
-                linhasUnicas.set(chave, {
-                    numero: t.line.short_name || "---",
+            // Chave de agrupamento: Número da Linha + Destino Exato
+            const chave = `${t.line.short_name}-${t.headsign}`;
+
+            if (!mapaAgrupado.has(chave)) {
+                mapaAgrupado.set(chave, {
+                    numero: t.line.short_name,
                     destino: t.headsign,
                     nomeLinha: t.line.name,
-                    horaSaida: t.departure_time.text,
-                    timestamp: t.departure_time.value
+                    horarios: []
+                });
+            }
+            
+            const info = mapaAgrupado.get(chave);
+            if (!info.horarios.some(h => h.texto === t.departure_time.text)) {
+                info.horarios.push({
+                    texto: t.departure_time.text,
+                    valor: t.departure_time.value
                 });
             }
         }
     });
 
-    renderizarPainel(Array.from(linhasUnicas.values()).sort((a,b) => a.timestamp - b.timestamp));
+    renderizar(Array.from(mapaAgrupado.values()));
 }
 
-function renderizarPainel(lista) {
+function renderizar(dados) {
     const container = document.getElementById('lista-horarios');
-    if (lista.length === 0) return;
+    container.innerHTML = dados.map(item => {
+        const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
+        const proximo = hOrdenados[0];
+        const futuros = hOrdenados.slice(1, 4);
+        
+        const n = parseInt(item.numero) || 0;
+        const cor = (n >= 300 && n <= 499) ? "var(--vsr-color)" : "var(--vjd-color)";
 
-    container.innerHTML = lista.map(item => {
-        const numero = parseInt(item.numero) || 0;
-        const cor = (numero >= 300 && numero <= 499) ? "var(--vsr-color)" : "var(--vjd-color)";
         return `
             <div class="linha-item">
                 <div class="indicador-empresa" style="background: ${cor}"></div>
                 <div class="numero-box">${item.numero}</div>
                 <div class="detalhes">
-                    <div class="destino-destaque">${item.destino}</div>
-                    <div class="nome-linha-sub">Linha: ${item.nomeLinha}</div>
+                    <div class="destino-texto">${item.destino}</div>
+                    <div class="linha-sub">Linha: ${item.nomeLinha}</div>
                 </div>
-                <div class="tempo-card">${item.horaSaida}</div>
+                <div class="tempo-container">
+                    <div class="tempo-destaque">${proximo.texto}</div>
+                    <div class="lista-proximos">
+                        ${futuros.map(f => `<div class="pila-horario">${f.texto}</div>`).join('')}
+                    </div>
+                </div>
             </div>`;
     }).join('');
 
@@ -222,12 +223,8 @@ function renderizarPainel(lista) {
 }
 
 setInterval(atualizarRelogio, 1000);
-setInterval(buscarProximasLinhas, 600000); // Atualiza dados a cada 10 min
-
-window.onload = () => {
-    atualizarRelogio();
-    buscarProximasLinhas();
-};
+setInterval(buscarDados, 600000);
+window.onload = () => { atualizarRelogio(); buscarDados(); };
 </script>
 </body>
 </html>
