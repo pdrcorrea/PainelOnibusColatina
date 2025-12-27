@@ -75,10 +75,39 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.08);
         }
 
-        .indicador-empresa { width: 18px; height: 115px; flex-shrink: 0; }
+        /* Barra lateral fixa e elegante */
+        .indicador-empresa { 
+            width: 10px; 
+            align-self: stretch; /* Garante que a barra ocupe toda a altura do card */
+            flex-shrink: 0;
+        }
 
-        .numero-box { padding: 0 25px; font-size: 38px; font-weight: 900; color: #333; min-width: 100px; text-align: center; }
+        /* Box do Número com identificação da empresa */
+        .numero-box-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            min-width: 90px;
+            gap: 5px;
+        }
 
+        .empresa-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .numero-box { 
+            font-size: 2.8rem; 
+            font-weight: 900; 
+            color: #333; 
+            line-height: 1;
+        }
         .detalhes { 
             flex-grow: 1; 
             padding-left: 20px; 
@@ -235,19 +264,27 @@ function renderizar(dados) {
     container.innerHTML = dados.map(item => {
         const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
         const proximo = hOrdenados[0];
-        const futuros = hOrdenados.slice(1, 4); // Pega até 3 próximos
+        const futuros = hOrdenados.slice(1, 4);
         
         const n = parseInt(item.numero) || 0;
-        const cor = (n >= 300 && n <= 499) ? "var(--vsr-color)" : "var(--vjd-color)";
+        const ehSaoRoque = (n >= 300 && n <= 499);
+        const cor = ehSaoRoque ? "var(--vsr-color)" : "var(--vjd-color)";
+        const siglaEmpresa = ehSaoRoque ? "VSR" : "VJD";
 
         return `
             <div class="linha-item">
                 <div class="indicador-empresa" style="background: ${cor}"></div>
-                <div class="numero-box">${item.numero}</div>
+                
+                <div class="numero-box-container">
+                    <div class="empresa-badge" style="background: ${cor}">${siglaEmpresa}</div>
+                    <div class="numero-box">${item.numero}</div>
+                </div>
+
                 <div class="detalhes">
                     <div class="destino-texto">${item.destino}</div>
                     <div class="linha-sub">Linha: ${item.nomeLinha}</div>
                 </div>
+
                 <div class="tempo-container">
                     <div class="tempo-destaque">${proximo ? proximo.texto : '--:--'}</div>
                     <div class="lista-proximos">
@@ -266,5 +303,6 @@ window.onload = () => { atualizarRelogio(); buscarDados(); };
 </script>
 </body>
 </html>
+
 
 
