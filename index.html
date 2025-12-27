@@ -115,91 +115,103 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8&libraries=places"></script>
 
 <script
-    async function buscarDadosReais() {
-    const estacaoCoord = new google.maps.LatLng(-19.5368231, -40.633973);
+// Substitua todo o seu script por este:
+let mapaAgrupado = new Map();
+
+async function buscarDados() {
+    const estacaoCoord = { lat: -19.5368231, lng: -40.633973 };
     const ds = new google.maps.DirectionsService();
     
-    // Lista de destinos "âncora" para forçar o Google a varrer todas as direções possíveis
-    // Aumentamos para 8 pontos cardeais para não escapar nenhuma linha
-    const anchors = [
-        {lat: -19.522, lng: -40.625}, {lat: -19.555, lng: -40.655},
-        {lat: -19.535, lng: -40.670}, {lat: -19.515, lng: -40.640},
-        {lat: -19.510, lng: -40.615}, {lat: -19.560, lng: -40.630},
-        {lat: -19.545, lng: -40.610}, {lat: -19.525, lng: -40.660}
-    ];
+    // Limpamos para nova busca
+    mapaAgrupado.clear();
 
-    let todasRotas = [];
+    // Criamos 12 pontos em um círculo perfeito ao redor da estação (raio de 3km)
+    // Isso força o Google a encontrar TODAS as linhas que saem do centro em qualquer direção
+    const pontosBusca = [];
+    for (let i = 0; i < 12; i++) {
+        const angulo = (i * 30) * (Math.PI / 180);
+        pontosBusca.push({
+            lat: estacaoCoord.lat + (0.03 * Math.PI / 180) * Math.sin(angulo),
+            lng: estacaoCoord.lng + (0.03 * Math.PI / 180) * Math.cos(angulo)
+        });
+    }
 
-    const promessas = anchors.map(ponto => {
+    const promessas = pontosBusca.map(ponto => {
         return new Promise((resolve) => {
             ds.route({
                 origin: estacaoCoord,
-                destination: new google.maps.LatLng(ponto.lat, ponto.lng),
+                destination: ponto,
                 travelMode: 'TRANSIT',
                 transitOptions: { 
                     departureTime: new Date(),
-                    routingPreference: 'FEWER_TRANSFERS' // Força a mostrar o ônibus direto
+                    routingPreference: 'FEWER_TRANSFERS'
                 },
                 provideRouteAlternatives: true
             }, (res, stat) => {
-                if (stat === 'OK') resolve(res.routes);
-                else resolve([]);
+                if (stat === 'OK') {
+                    processarRotas(res.routes);
+                    resolve();
+                } else {
+                    resolve();
+                }
             });
         });
     });
 
-    const resultados = await Promise.all(promessas);
-    const mapaAgrupado = new Map();
+    await Promise.all(promessas);
+    const listaOrdenada = ordenarDados();
+    renderizar(listaOrdenada);
+}
 
-    resultados.flat().forEach(rota => {
-        const step = rota.legs[0].steps.find(s => s.transit);
+function processarRotas(routes) {
+    routes.forEach(rota => {
+        const leg = rota.legs[0];
+        const step = leg.steps.find(s => s.transit);
+        
         if (step && step.transit) {
             const t = step.transit;
-            // Chave baseada no número e no destino final (headsign)
-            const chave = `${t.line.short_name}-${t.headsign}`;
+            const numero = t.line.short_name || t.line.name.split(' ')[0];
+            const chave = `${numero}-${t.headsign}`;
 
             if (!mapaAgrupado.has(chave)) {
                 mapaAgrupado.set(chave, {
-                    numero: t.line.short_name,
+                    numero: numero,
                     destino: t.headsign,
                     nomeLinha: t.line.name,
                     horarios: []
                 });
             }
-            
+
             const info = mapaAgrupado.get(chave);
             const horaTexto = t.departure_time.text;
             const horaValor = t.departure_time.value.getTime();
 
-            // Só adiciona se o horário for no futuro e não estiver duplicado
             if (!info.horarios.some(h => h.texto === horaTexto)) {
                 info.horarios.push({ texto: horaTexto, valor: horaValor });
             }
         }
     });
+}
 
-    // --- ORDENAÇÃO FINAL ---
-    const listaFinal = Array.from(mapaAgrupado.values()).sort((a, b) => {
-        // Pega o menor horário de cada card para comparar
+function ordenarDados() {
+    return Array.from(mapaAgrupado.values()).sort((a, b) => {
         const minA = Math.min(...a.horarios.map(h => h.valor));
         const minB = Math.min(...b.horarios.map(h => h.valor));
 
-        if (minA !== minB) return minA - minB; // Ordem cronológica
-        return parseInt(a.numero) - parseInt(b.numero); // Desempate por número da linha
+        if (minA !== minB) return minA - minB;
+        // Ordenação numérica para linhas (ex: 10, 20, 110...)
+        return a.numero.localeCompare(b.numero, undefined, {numeric: true});
     });
-
-    renderizar(listaFinal);
 }
 
 function renderizar(dados) {
     const container = document.getElementById('lista-horarios');
     if (dados.length === 0) {
-        container.innerHTML = `<div style="color:white; text-align:center; padding:50px;">Buscando linhas...</div>`;
+        container.innerHTML = `<div style="color:white; text-align:center; padding:50px; font-size:1.5rem;">Aguardando dados do Google Maps...</div>`;
         return;
     }
 
     container.innerHTML = dados.map(item => {
-        // Ordena os horários dentro das pílulas
         const hOrdenados = item.horarios.sort((a,b) => a.valor - b.valor);
         const n = parseInt(item.numero) || 0;
         const ehSR = (n >= 300 && n <= 499);
@@ -226,13 +238,13 @@ function renderizar(dados) {
             </div>`;
     }).join('');
 
-    // Garante volta ao topo e inicia scroll
     container.scrollTop = 0;
     setTimeout(iniciarAutoScroll, 2000);
 }
 ></script>
 </body>
 </html>
+
 
 
 
