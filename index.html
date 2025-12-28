@@ -3,40 +3,40 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Next Bus • Estação Central</title>
+  <title>Painel de Horários • Estação Central</title>
 
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
-  <!-- Fonte -->
+  <!-- Fonte (simples e bem legível) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg0:#061017;
-      --bg1:#071b23;
+      --blueA:#1f4f8f;
+      --blueB:#3b82c4;
+      --yellow:#facc15;
 
-      --glass: rgba(255,255,255,.10);
-      --glass2: rgba(255,255,255,.06);
-      --border: rgba(255,255,255,.18);
+      --bg:#eef2f7;
+      --card:#ffffff;
+      --stroke:#e5e7eb;
+      --shadow: 0 10px 24px rgba(15, 23, 42, .10);
 
-      --text: rgba(255,255,255,.92);
-      --dim: rgba(255,255,255,.70);
-      --faint: rgba(255,255,255,.52);
+      --text:#0f172a;
+      --muted:#475569;
 
-      --okBg: rgba(74, 222, 128, .16);
-      --okBorder: rgba(74, 222, 128, .35);
-      --okText: rgba(220, 255, 235, .96);
+      --green:#22c55e;
+      --greenDark:#16a34a;
 
-      --vjd: rgba(16, 65, 130, .95);   /* azul escuro */
-      --vsr: rgba(96, 190, 255, .95);  /* azul claro */
+      --vjd:#1e3a8a;
+      --vsr:#0ea5e9;
 
-      --shadow: 0 22px 70px rgba(0,0,0,.22);
-      --shadow2: 0 10px 30px rgba(0,0,0,.14);
+      --glass: rgba(255,255,255,.50);
+      --glassStroke: rgba(255,255,255,.65);
 
-      --r: 22px;
-      --pad: clamp(14px, 2.2vw, 20px);
+      --r: 16px;
+      --pad: clamp(14px, 1.8vw, 20px);
     }
 
     *{ box-sizing:border-box; }
@@ -44,313 +44,368 @@
     body{
       margin:0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 900px at 30% 15%, rgba(90,170,255,.18) 0%, rgba(10,46,62,0) 65%),
-        radial-gradient(900px 700px at 75% 75%, rgba(85,230,205,.10) 0%, rgba(6,18,24,0) 70%),
-        radial-gradient(1400px 1100px at 50% 55%, var(--bg1) 0%, var(--bg0) 62%, #040a0f 100%);
+      background: var(--bg);
+      color: var(--text);
       overflow:hidden;
     }
 
-    .noise{
-      position:fixed; inset:0; pointer-events:none; z-index:-1;
-      opacity:.08;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
-      background-size:180px 180px; mix-blend-mode:overlay;
-    }
-
-    .app{
-      height:100%;
-      display:grid;
-      grid-template-rows: auto 1fr;
-      gap: 14px;
-      padding: clamp(14px, 2.0vw, 22px);
-    }
-
-    /* Header: sinalização digital */
-    header{
+    /* HEADER (estilo do anexo) */
+    .header{
+      height: 120px;
+      padding: 18px 22px;
+      background: linear-gradient(90deg, var(--blueA), var(--blueB));
+      color: #fff;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding: var(--pad);
-      border-radius: var(--r);
-      background: linear-gradient(135deg, var(--glass), var(--glass2));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 4px solid var(--yellow);
     }
 
     .h-left{
       display:flex;
       align-items:center;
-      gap: 14px;
+      gap: 16px;
       min-width: 0;
     }
 
-    .iconWrap{
-      width: 48px; height: 48px;
-      border-radius: 16px;
+    .h-icon{
+      width: 54px; height:54px;
       display:grid; place-items:center;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 10px 26px rgba(0,0,0,.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.22);
     }
-    .material-icons-outlined{ font-size: 26px; opacity:.92; }
+    .h-icon .material-icons-outlined{ font-size:30px; }
 
-    .titleBlock{ min-width:0; }
-    .title{
-      font-size: clamp(18px, 2.2vw, 26px);
+    .h-titles{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      min-width:0;
+    }
+    .h-title{
+      font-size: clamp(24px, 3.0vw, 38px);
       font-weight: 800;
-      letter-spacing: .08em;
+      letter-spacing: .06em;
       text-transform: uppercase;
+      line-height: 1;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .sub{
-      margin-top:4px;
-      font-size: 12px;
-      letter-spacing: .14em;
-      color: var(--dim);
-      text-transform: uppercase;
-    }
-
-    /* Relógio SEM segundos */
-    .clock{
+    .h-sub{
       display:flex;
-      align-items:baseline;
-      user-select:none;
-      white-space:nowrap;
+      align-items:center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      opacity:.95;
     }
-    .clock .hm{
-      font-size: clamp(34px, 4.5vw, 56px);
-      font-weight: 800;
+    .h-sub .material-icons-outlined{ font-size:20px; opacity:.95; }
+
+    /* relógio no canto (como no anexo) */
+    .clockBox{
+      min-width: 290px;
+      text-align:right;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.22);
+    }
+    .clock{
+      font-size: clamp(34px, 4.2vw, 52px);
+      font-weight: 900;
       letter-spacing: .02em;
+      color: var(--yellow);
       line-height: 1;
     }
-
-    /* Painel */
-    .panel{
-      border-radius: var(--r);
-      background: linear-gradient(135deg, var(--glass), var(--glass2));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+    .clockDate{
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      opacity:.95;
+      color: #fff;
+      white-space:nowrap;
       overflow:hidden;
-      position:relative;
+      text-overflow:ellipsis;
     }
 
-    .topline{
-      padding: 10px var(--pad);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      color: var(--dim);
-      font-size: 12px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-    }
-
-    .warn{
-      padding: 10px 14px;
-      border-radius: 14px;
-      border: 1px dashed rgba(255,255,255,.18);
-      background: rgba(0,0,0,.12);
-      color: rgba(255,255,255,.72);
-      font-size: 12px;
-      letter-spacing: .10em;
-      text-transform: uppercase;
-      margin: 12px var(--pad) 0;
-      display:none;
-    }
-
-    .scrollArea{
-      height: calc(100% - 44px);
-      overflow:auto;
-      scrollbar-width: none;
-    }
-    .scrollArea::-webkit-scrollbar{ width:0; height:0; }
-
-    .list{
-      padding: var(--pad);
+    /* CONTEÚDO */
+    .main{
+      height: calc(100% - 120px);
+      padding: 18px 22px;
       display:grid;
+      grid-template-rows: auto 1fr auto;
       gap: 12px;
     }
 
-    /* Card: leitura confortável */
-    .card{
-      display:grid;
-      grid-template-columns: 130px 1fr 320px;
-      gap: 16px;
+    .topRow{
+      display:flex;
       align-items:center;
-      padding: 16px 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 14px 40px rgba(0,0,0,.10);
-      min-height: 96px;
+      justify-content:space-between;
+      gap: 12px;
     }
 
-    .lineBox{
+    .status{
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* progress bar de troca de página */
+    .pager{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 360px;
+      justify-content:flex-end;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+    .bar{
+      width: 220px;
+      height: 10px;
+      border-radius: 999px;
+      background: #dbe3ef;
+      overflow:hidden;
+      border: 1px solid #cfd8e6;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #60a5fa, #2563eb);
+      border-radius: 999px;
+      transition: width 120ms linear;
+    }
+
+    /* LISTA / PÁGINA */
+    .pageWrap{
+      background: transparent;
+      overflow:hidden;
+      display:grid;
+      align-content:start;
+      gap: 14px;
+    }
+
+    .empty{
+      padding: 32px;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      text-align:center;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    /* CARD simples (estilo do anexo) */
+    .card{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      display:grid;
+      grid-template-columns: 140px 1fr 280px;
+      gap: 14px;
+      align-items:center;
+      padding: 18px 18px;
+      position:relative;
+    }
+
+    /* “faixa” azul na esquerda */
+    .card::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width: 6px;
+      border-radius: var(--r) 0 0 var(--r);
+      background: #2563eb;
+    }
+
+    .lineCol{
       display:flex;
       flex-direction:column;
-      gap: 10px; /* badge abaixo do número */
+      gap: 10px;
+      padding-left: 6px;
       align-items:flex-start;
     }
     .lineNum{
-      font-size: 40px;
-      font-weight: 800;
+      font-size: 52px;
+      font-weight: 900;
       letter-spacing: .02em;
       line-height: 1;
+      color: #111827;
     }
-    .company{
+
+    /* badge (mantém glass, mas discreto) */
+    .badge{
       display:inline-flex;
       align-items:center;
       gap: 8px;
-      font-size: 12px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.86);
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.10);
+      background: var(--glass);
+      border: 1px solid var(--glassStroke);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: #0f172a;
     }
     .dot{
-      width: 9px; height: 9px; border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(255,255,255,.10) inset;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(15,23,42,.06) inset;
     }
 
-    .dest{
+    .midCol{
       min-width:0;
       display:flex;
       flex-direction:column;
       gap: 8px;
     }
+
+    /* ✅ Destino maior (mais legível) */
     .destName{
-      font-size: 28px;
-      font-weight: 700;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      font-size: clamp(22px, 2.4vw, 34px);
+      font-weight: 900;
       letter-spacing: .02em;
-    }
-    .meta{
-      font-size: 12px;
-      color: var(--dim);
-      letter-spacing: .10em;
+      line-height: 1.1;
       text-transform: uppercase;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    /* Horários: destaque + abaixo os próximos */
-    .times{
+    .meta{
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .timeCol{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
       gap: 10px;
     }
-    .next{
+
+    /* destaque do próximo horário (HH:MM) */
+    .nextTime{
       width: 100%;
-      max-width: 320px;
       display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: var(--okBg);
-      border: 1px solid var(--okBorder);
-      box-shadow: 0 16px 40px rgba(0,0,0,.12);
-    }
-    .next .mins{
-      font-size: 28px;
-      font-weight: 800;
+      align-items:center;
+      justify-content:center;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+      font-size: 40px;
       letter-spacing: .02em;
-      color: var(--okText);
-      line-height: 1;
-    }
-    .next .when{
-      font-size: 18px;
-      letter-spacing: .14em;
-      color: rgba(220,255,235,.78);
-      text-transform: uppercase;
-      font-weight: 700;
-      white-space:nowrap;
+      box-shadow: 0 10px 18px rgba(34,197,94,.25);
     }
 
     .moreRow{
-      width: 100%;
       display:flex;
-      gap: 10px;
+      gap: 8px;
       justify-content:flex-end;
       flex-wrap:nowrap;
+      width: 100%;
     }
     .pill{
       padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
-      min-width: 86px;
+      border-radius: 10px;
+      background: #eef2f7;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      font-weight: 900;
+      color: #334155;
+      letter-spacing: .06em;
+      min-width: 72px;
       text-align:center;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .10em;
-      color: rgba(255,255,255,.74);
     }
 
-    .empty{
-      padding: 28px;
-      color: var(--dim);
-      text-align:center;
+    .footerRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
       letter-spacing: .10em;
       text-transform: uppercase;
+      padding: 0 2px;
     }
 
+    /* Responsivo */
     @media (max-width: 980px){
+      .header{ height:auto; flex-direction:column; align-items:flex-start; gap: 14px; }
+      .clockBox{ width:100%; text-align:left; }
+      .main{ height:auto; }
+      body{ overflow:auto; }
       .card{ grid-template-columns: 1fr; }
-      .times{ align-items:flex-start; }
-      .next, .moreRow{ max-width: none; }
+      .timeCol{ align-items:flex-start; }
       .moreRow{ justify-content:flex-start; }
     }
   </style>
 </head>
 
 <body>
-  <div class="noise" aria-hidden="true"></div>
-
-  <div class="app">
-    <header>
-      <div class="h-left">
-        <div class="iconWrap"><span class="material-icons-outlined" aria-hidden="true">directions_bus</span></div>
-        <div class="titleBlock">
-          <div class="title">Estação Central</div>
-          <div class="sub" id="subStatus">Carregando…</div>
+  <header class="header">
+    <div class="h-left">
+      <div class="h-icon"><span class="material-icons-outlined" aria-hidden="true">directions_bus</span></div>
+      <div class="h-titles">
+        <div class="h-title">Painel de Horários</div>
+        <div class="h-sub">
+          <span class="material-icons-outlined" aria-hidden="true">location_on</span>
+          <span>Estação Central</span>
         </div>
       </div>
+    </div>
 
-      <div class="clock" aria-label="Relógio">
-        <div class="hm" id="hm">--:--</div>
+    <div class="clockBox" aria-label="Relógio e data">
+      <div class="clock" id="clock">--:--</div>
+      <div class="clockDate" id="clockDate">—</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="topRow">
+      <div class="status" id="status">Carregando linhas…</div>
+
+      <div class="pager">
+        <span id="pageLabel">PÁGINA 1/1</span>
+        <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
       </div>
-    </header>
+    </div>
 
-    <section class="panel">
-      <div class="topline">
-        <div id="lastUpdate">—</div>
-        <div>Próximos horários • Janela 2h</div>
-      </div>
+    <section class="pageWrap" id="pageWrap"></section>
 
-      <div class="warn" id="apiWarn"></div>
-
-      <div class="scrollArea" id="scrollArea">
-        <div class="list" id="list"></div>
-      </div>
-    </section>
-  </div>
+    <div class="footerRow">
+      <div id="lastUpdate">—</div>
+      <div>Somente próximas 2 horas</div>
+    </div>
+  </main>
 
   <script>
     /*******************************************************************
@@ -366,31 +421,35 @@
     const SWEEP_RADIUS_M = 1200;
 
     const REFRESH_EVERY_MS = 10 * 60 * 1000; // 10 min
-    const MAX_TIMES_PER_LINE = 4;            // 1 destaque + 3 seguintes
-    const WINDOW_NEXT_HOURS = 2;             // ✅ somente próximas 2h
+    const WINDOW_NEXT_HOURS = 2;             // próximas 2h
+    const MAX_TIMES_PER_LINE = 4;            // 1 destaque + 3 próximos
 
-    // Auto-scroll
-    const SCROLL_PX_PER_TICK = 1;
-    const SCROLL_TICK_MS = 22;
-    const SCROLL_END_DELAY_MS = 5000;
+    // Paginação (substitui scroll)
+    const ITEMS_PER_PAGE = 6;                // quantos cards por tela
+    const PAGE_DURATION_MS = 12000;          // troca automática (12s)
 
     /*******************************************************************
      * UI refs
      *******************************************************************/
-    const hmEl = document.getElementById("hm");
-    const listEl = document.getElementById("list");
-    const subStatusEl = document.getElementById("subStatus");
+    const statusEl = document.getElementById("status");
+    const pageWrapEl = document.getElementById("pageWrap");
     const lastUpdateEl = document.getElementById("lastUpdate");
-    const scrollAreaEl = document.getElementById("scrollArea");
-    const apiWarnEl = document.getElementById("apiWarn");
+    const pageLabelEl = document.getElementById("pageLabel");
+    const barFillEl = document.getElementById("barFill");
+    const clockEl = document.getElementById("clock");
+    const clockDateEl = document.getElementById("clockDate");
 
     /*******************************************************************
-     * Clock (SEM segundos)
+     * Clock (SEM segundos) + data (simples)
      *******************************************************************/
+    const weekday = ["DOMINGO","SEGUNDA","TERÇA","QUARTA","QUINTA","SEXTA","SÁBADO"];
+    const month   = ["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"];
     function pad2(n){ return String(n).padStart(2,"0"); }
+
     function tickClock(){
       const d = new Date();
-      hmEl.textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      clockEl.textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      clockDateEl.textContent = `${weekday[d.getDay()]}, ${pad2(d.getDate())} DE ${month[d.getMonth()]}`;
     }
     function startClock(){
       tickClock();
@@ -399,7 +458,7 @@
     }
 
     /*******************************************************************
-     * Loader Google Maps JS API
+     * Loader Google Maps
      *******************************************************************/
     function loadGoogleMaps(){
       return new Promise((resolve, reject) => {
@@ -407,8 +466,7 @@
 
         const key = (GOOGLE_MAPS_API_KEY || "").trim();
         if (!key || key === "COLE_SUA_API_KEY_AQUI"){
-          apiWarnEl.style.display = "block";
-          apiWarnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY NA CONSTANTE 'GOOGLE_MAPS_API_KEY' (TOPO DO JS).";
+          statusEl.textContent = "Insira sua Google Maps API Key no código.";
           return reject(new Error("Missing API key"));
         }
 
@@ -418,17 +476,13 @@
         script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=__gmReady`;
         script.async = true;
         script.defer = true;
-        script.onerror = () => {
-          apiWarnEl.style.display = "block";
-          apiWarnEl.textContent = "Falha ao carregar Google Maps JS API. Verifique KEY, restrições de domínio e internet.";
-          reject(new Error("Failed to load Google Maps"));
-        };
+        script.onerror = () => reject(new Error("Failed to load Google Maps"));
         document.head.appendChild(script);
       });
     }
 
     /*******************************************************************
-     * Geodesia: destino por bearing + distância
+     * Geodesia (12 destinos ao redor)
      *******************************************************************/
     function toRad(deg){ return deg * Math.PI / 180; }
     function toDeg(rad){ return rad * 180 / Math.PI; }
@@ -462,27 +516,25 @@
     }
 
     /*******************************************************************
-     * Helpers: tempo vindo do Maps (Date vs number)
-     * ✅ Corrige o bug do "min" enorme
+     * Helpers: tempo do Maps (Date vs number) — robusto
      *******************************************************************/
     function normalizeTimeValue(value){
-      // Maps JS normalmente retorna Date
       if (value instanceof Date) return value.getTime();
-
-      // Às vezes vem como objeto tipo { value: Date } já tratado acima no caller,
-      // mas garantimos aqui caso venha number/string:
       if (typeof value === "number" && Number.isFinite(value)){
-        // se for “seconds since epoch” (1e9~), converte; se for ms (1e12~), mantém
         return value < 1e12 ? value * 1000 : value;
       }
       const n = Number(value);
       if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n;
-
       return null;
     }
 
+    function fmtHHMM(ms){
+      const d = new Date(ms);
+      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+
     /*******************************************************************
-     * Parsing do Directions (TRANSIT)
+     * Empresa por faixa
      *******************************************************************/
     function companyFromLineNumber(lineShort){
       const n = parseInt(String(lineShort).replace(/\D/g,""), 10);
@@ -491,6 +543,9 @@
       return { code:"VJD", color:"var(--vjd)" };
     }
 
+    /*******************************************************************
+     * Parse Directions (TRANSIT)
+     *******************************************************************/
     function extractTripsFromDirectionsResult(result){
       const trips = [];
       if (!result?.routes?.length) return trips;
@@ -509,7 +564,6 @@
           const depVal = td.departure_time?.value ?? null;
           const arrVal = td.arrival_time?.value ?? null;
 
-          // prefer arrival, fallback departure
           const timeMs = normalizeTimeValue(arrVal) ?? normalizeTimeValue(depVal);
           if (!timeMs) continue;
 
@@ -525,26 +579,23 @@
     }
 
     /*******************************************************************
-     * Dedup + Janela 2h + Agrupamento + Ordenação
+     * Dedup + janela 2h + agrupamento
      *******************************************************************/
     function aggregateTrips(allTrips){
       const now = Date.now();
       const windowEnd = now + WINDOW_NEXT_HOURS * 60 * 60 * 1000;
 
-      // remove duplicatas
       const uniqMap = new Map();
       for (const t of allTrips) uniqMap.set(t.key, t);
       const uniq = Array.from(uniqMap.values());
 
-      // ✅ mantém apenas dentro da janela (próximas 2h)
       const filtered = uniq.filter(t => t.timeMs >= now - 30_000 && t.timeMs <= windowEnd);
 
-      // agrupa por linha+destino
       const groups = new Map();
       for (const t of filtered){
-        const gKey = `${t.line}||${t.destination}`;
-        if (!groups.has(gKey)) groups.set(gKey, { line: t.line, destination: t.destination, times: [] });
-        groups.get(gKey).times.push(t.timeMs);
+        const k = `${t.line}||${t.destination}`;
+        if (!groups.has(k)) groups.set(k, { line: t.line, destination: t.destination, times: [] });
+        groups.get(k).times.push(t.timeMs);
       }
 
       const cards = [];
@@ -553,127 +604,17 @@
         g.times = g.times.slice(0, MAX_TIMES_PER_LINE);
         if (!g.times.length) continue;
 
-        cards.push({
-          line: g.line,
-          destination: g.destination,
-          times: g.times,
-          nextTime: g.times[0]
-        });
+        cards.push({ line: g.line, destination: g.destination, times: g.times, nextTime: g.times[0] });
       }
 
       cards.sort((a,b) => a.nextTime - b.nextTime);
       return cards;
     }
 
-    function minsFromNow(ms){
-      const diff = ms - Date.now();
-      return Math.max(0, Math.round(diff / 60000));
-    }
-    function fmtHHMM(ms){
-      const d = new Date(ms);
-      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    }
-
     /*******************************************************************
-     * Render (próximos abaixo do destaque)
-     *******************************************************************/
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, (m) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-
-    function render(cards){
-      listEl.innerHTML = "";
-
-      if (!cards.length){
-        listEl.innerHTML = `<div class="empty">Sem horários nas próximas ${WINDOW_NEXT_HOURS} horas.</div>`;
-        return;
-      }
-
-      const frag = document.createDocumentFragment();
-
-      for (const c of cards){
-        const company = companyFromLineNumber(c.line);
-
-        const nextMs = c.times[0];
-        const nextMins = minsFromNow(nextMs);
-        const nextClock = fmtHHMM(nextMs);
-
-        const moreTimes = c.times.slice(1, 4).map(ms => `<div class="pill">${fmtHHMM(ms)}</div>`).join("");
-
-        const el = document.createElement("div");
-        el.className = "card";
-        el.innerHTML = `
-          <div class="lineBox">
-            <div class="lineNum">${escapeHtml(c.line)}</div>
-            <div class="company">
-              <span class="dot" style="background:${company.color}"></span>
-              <span>${company.code}</span>
-            </div>
-          </div>
-
-          <div class="dest">
-            <div class="destName">${escapeHtml(c.destination)}</div>
-            <div class="meta">Próximo às ${nextClock}</div>
-          </div>
-
-          <div class="times">
-            <div class="next">
-              <div class="mins">${nextMins} min</div>
-              <div class="when">${nextClock}</div>
-            </div>
-            <div class="moreRow">
-              ${moreTimes || `<div class="pill" style="opacity:.6">—</div>`}
-            </div>
-          </div>
-        `;
-        frag.appendChild(el);
-      }
-
-      listEl.appendChild(frag);
-    }
-
-    /*******************************************************************
-     * Auto-scroll suave
-     *******************************************************************/
-    let scrollTimer = null;
-    let endDelayTimer = null;
-
-    function stopAutoScroll(){
-      if (scrollTimer) clearInterval(scrollTimer);
-      if (endDelayTimer) clearTimeout(endDelayTimer);
-      scrollTimer = null;
-      endDelayTimer = null;
-    }
-
-    function startAutoScroll(){
-      stopAutoScroll();
-      const el = scrollAreaEl;
-
-      scrollTimer = setInterval(() => {
-        const maxScroll = el.scrollHeight - el.clientHeight;
-        if (maxScroll <= 0) return;
-
-        el.scrollTop += SCROLL_PX_PER_TICK;
-
-        if (el.scrollTop >= maxScroll){
-          stopAutoScroll();
-          endDelayTimer = setTimeout(() => {
-            el.scrollTop = 0;
-            startAutoScroll();
-          }, SCROLL_END_DELAY_MS);
-        }
-      }, SCROLL_TICK_MS);
-    }
-
-    /*******************************************************************
-     * Directions: 12 requisições simultâneas
+     * Directions runner (12 requests)
      *******************************************************************/
     let directionsService = null;
-    let refreshTimer = null;
-
-    function setStatus(text){ subStatusEl.textContent = text; }
 
     function requestDirectionsTo(dest){
       return new Promise((resolve) => {
@@ -692,8 +633,113 @@
       });
     }
 
+    /*******************************************************************
+     * PAGINAÇÃO automática + barra
+     *******************************************************************/
+    let allCards = [];
+    let currentPage = 0;
+    let pageTimer = null;
+    let barTimer = null;
+    let pageStartTs = 0;
+
+    function stopPager(){
+      if (pageTimer) clearInterval(pageTimer);
+      if (barTimer) clearInterval(barTimer);
+      pageTimer = null;
+      barTimer = null;
+    }
+
+    function pageCount(){
+      return Math.max(1, Math.ceil(allCards.length / ITEMS_PER_PAGE));
+    }
+
+    function renderPage(pageIndex){
+      const totalPages = pageCount();
+      currentPage = ((pageIndex % totalPages) + totalPages) % totalPages;
+
+      const start = currentPage * ITEMS_PER_PAGE;
+      const slice = allCards.slice(start, start + ITEMS_PER_PAGE);
+
+      pageLabelEl.textContent = `PÁGINA ${currentPage + 1}/${totalPages}`;
+      pageWrapEl.innerHTML = "";
+
+      if (!slice.length){
+        pageWrapEl.innerHTML = `<div class="empty">Sem horários nas próximas ${WINDOW_NEXT_HOURS} horas.</div>`;
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+
+      for (const c of slice){
+        const company = companyFromLineNumber(c.line);
+        const nextClock = fmtHHMM(c.times[0]);
+        const more = c.times.slice(1, 4);
+
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="lineCol">
+            <div class="lineNum">${escapeHtml(c.line)}</div>
+            <div class="badge">
+              <span class="dot" style="background:${company.color}"></span>
+              <span>${company.code}</span>
+            </div>
+          </div>
+
+          <div class="midCol">
+            <div class="destName" title="${escapeHtml(c.destination)}">${escapeHtml(c.destination)}</div>
+            <div class="meta">Próximo: ${nextClock}</div>
+          </div>
+
+          <div class="timeCol">
+            <div class="nextTime">${nextClock}</div>
+            <div class="moreRow">
+              ${more.length ? more.map(ms => `<div class="pill">${fmtHHMM(ms)}</div>`).join("") : `<div class="pill" style="opacity:.6">—</div>`}
+            </div>
+          </div>
+        `;
+        frag.appendChild(el);
+      }
+
+      pageWrapEl.appendChild(frag);
+    }
+
+    function startPager(){
+      stopPager();
+      renderPage(0);
+
+      pageStartTs = performance.now();
+      barFillEl.style.width = "0%";
+
+      // barra (atualiza ~10x/s)
+      barTimer = setInterval(() => {
+        const elapsed = performance.now() - pageStartTs;
+        const pct = Math.min(100, (elapsed / PAGE_DURATION_MS) * 100);
+        barFillEl.style.width = pct.toFixed(1) + "%";
+      }, 100);
+
+      // troca de página
+      pageTimer = setInterval(() => {
+        pageStartTs = performance.now();
+        barFillEl.style.width = "0%";
+        renderPage(currentPage + 1);
+      }, PAGE_DURATION_MS);
+    }
+
+    /*******************************************************************
+     * Render helpers
+     *******************************************************************/
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    /*******************************************************************
+     * Refresh data
+     *******************************************************************/
     async function refreshData(){
-      setStatus("Buscando linhas (varredura 360º)…");
+      statusEl.textContent = "Buscando linhas…";
       const t0 = performance.now();
 
       if (!directionsService) directionsService = new google.maps.DirectionsService();
@@ -701,30 +747,31 @@
       const destinations = buildSweepDestinations();
       const responses = await Promise.all(destinations.map(d => requestDirectionsTo(d)));
 
-      const allTrips = [];
-      let okCount = 0;
-
+      const trips = [];
+      let ok = 0;
       for (const r of responses){
         if (r.ok){
-          okCount++;
-          allTrips.push(...extractTripsFromDirectionsResult(r.result));
+          ok++;
+          trips.push(...extractTripsFromDirectionsResult(r.result));
         }
       }
 
-      const cards = aggregateTrips(allTrips);
-      render(cards);
+      allCards = aggregateTrips(trips);
 
-      const dt = Math.round(performance.now() - t0);
       const now = new Date();
       lastUpdateEl.textContent = `Atualizado • ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
-      setStatus(okCount ? `Linhas: ${cards.length} • OK: ${okCount}/12 • ${dt}ms` : "Sem resposta útil da API.");
+      statusEl.textContent = ok ? `Linhas exibidas: ${allCards.length} • Janela: ${WINDOW_NEXT_HOURS}h` : "Sem resposta da API (verifique key/restrições).";
 
-      startAutoScroll();
+      // reinicia paginação sempre que atualizar os dados (mantém claro e previsível)
+      startPager();
+
+      const dt = Math.round(performance.now() - t0);
+      // (dt fica só no console para não poluir a tela)
+      console.log("refreshData ms:", dt, "cards:", allCards.length, "ok:", ok);
     }
 
     function scheduleRefresh(){
-      if (refreshTimer) clearInterval(refreshTimer);
-      refreshTimer = setInterval(refreshData, REFRESH_EVERY_MS);
+      setInterval(refreshData, REFRESH_EVERY_MS);
     }
 
     /*******************************************************************
@@ -734,21 +781,15 @@
 
     (async function boot(){
       try{
-        setStatus("Carregando Google Maps…");
         await loadGoogleMaps();
-        apiWarnEl.style.display = "none";
-
-        setStatus("Atualizando linhas…");
+        statusEl.textContent = "Atualizando…";
         await refreshData();
         scheduleRefresh();
       }catch(err){
-        setStatus("Aguardando API Key…");
+        statusEl.textContent = "Insira uma API Key válida (Google Maps).";
         console.warn(err);
       }
     })();
   </script>
 </body>
 </html>
-
-
-
