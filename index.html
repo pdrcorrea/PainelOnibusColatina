@@ -1,255 +1,717 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Estação Central - Colatina</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        :root {
-            --bg-body: #f0f2f5;
-            --header-accent: #ffd700;
-            --card-bg: #ffffff;
-            --card-border: #e0e0e0;
-            --text-main: #1a1a1a;
-            --text-sub: #666666;
-            --vjd-color: #0056b3; 
-            --vsr-color: #00bfff; 
-            --time-highlight: #27ae60;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Next Bus • Estação Central</title>
 
-        body { 
-            background: var(--bg-body); 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            margin: 0; padding: 0;
-            overflow: hidden;
-        }
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <!-- Fonte -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
 
-        /* CABEÇALHO */
-        .header { 
-            background-image: linear-gradient(to right, rgba(0, 32, 96, 0.9), rgba(0, 112, 192, 0.7)), url('https://ibb.co/QjC6YvhB');
-            background-size: cover;
-            background-position: center;
-            padding: 15px 50px; 
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            border-bottom: 4px solid var(--header-accent);
-            color: white;
-            z-index: 10;
-        }
+  <style>
+    :root{
+      --bg0:#061017;
+      --bg1:#071b23;
 
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-left i { font-size: 45px; }
-        .header-title { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; line-height: 1; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
-        .header-subtitle { font-size: 1.1rem; font-weight: 600; color: #f0f0f0; text-transform: uppercase; display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+      --glass: rgba(255,255,255,.10);
+      --glass2: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.18);
 
-        .header-right { 
-            text-align: center; 
-            background: rgba(255, 255, 255, 0.1); 
-            padding: 10px 20px; 
-            border-radius: 15px; 
-            backdrop-filter: blur(5px); 
-            border: 1px solid rgba(255,255,255,0.2);
-            min-width: 180px; 
-        }
-        #hora-atual { font-size: 3.5rem; font-weight: 800; color: var(--header-accent); display: block; line-height: 1; }
+      --text: rgba(255,255,255,.92);
+      --dim: rgba(255,255,255,.70);
+      --faint: rgba(255,255,255,.50);
 
-        /* LISTA */
-        .lista-horarios { 
-            height: calc(100vh - 145px);
-            overflow-y: hidden;
-            padding: 25px 50px;
-            box-sizing: border-box;
-        }
+      --ok: rgba(74, 222, 128, .18);
+      --okBorder: rgba(74, 222, 128, .40);
+      --okText: rgba(210, 255, 227, .95);
 
-        .linha-item { 
-            background: var(--card-bg); margin-bottom: 18px;
-            display: flex; align-items: center;
-            border-radius: 15px; overflow: hidden;
-            border: 1px solid var(--card-border); 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-        }
+      --vjd: rgba(16, 65, 130, .95);   /* azul escuro */
+      --vsr: rgba(96, 190, 255, .95);  /* azul claro */
 
-        .indicador-empresa { width: 10px; align-self: stretch; flex-shrink: 0; }
+      --shadow: 0 22px 70px rgba(0,0,0,.22);
+      --shadow2: 0 10px 30px rgba(0,0,0,.14);
 
-        .numero-box { padding: 0 25px; font-size: 3.2rem; font-weight: 900; color: #222; min-width: 100px; text-align: center; }
+      --r: 22px;
+      --pad: clamp(14px, 2.2vw, 20px);
+    }
 
-        .detalhes { flex-grow: 1; padding: 10px 0; overflow: hidden; }
-        .destino-texto { font-weight: 900; font-size: 1.9rem; text-transform: uppercase; color: #1a1a1a; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .linha-info-container { display: flex; align-items: center; gap: 8px; }
-        .empresa-badge { font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; color: white; text-transform: uppercase; }
-        .linha-sub { font-size: 1.1rem; color: var(--text-sub); font-weight: 600; }
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 900px at 30% 15%, rgba(90,170,255,.20) 0%, rgba(10,46,62,0) 65%),
+                  radial-gradient(900px 700px at 75% 75%, rgba(85,230,205,.12) 0%, rgba(6,18,24,0) 70%),
+                  radial-gradient(1400px 1100px at 50% 55%, var(--bg1) 0%, var(--bg0) 62%, #040a0f 100%);
+      overflow:hidden;
+    }
 
-        /* COLUNA DE TEMPO ALINHADA AO RELÓGIO */
-        .tempo-container { 
-            display: flex; flex-direction: column; align-items: center; gap: 8px; 
-            padding: 15px 25px; min-width: 180px; background: rgba(0,0,0,0.02);
-        }
-        .tempo-destaque {
-            background: var(--time-highlight); color: #ffffff; width: 100%; padding: 8px 0; border-radius: 10px;
-            font-weight: 900; font-size: 2.8rem; text-align: center; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); line-height: 1;
-        }
-        .lista-proximos { display: flex; flex-direction: row; gap: 5px; width: 100%; }
-        .pila-horario { background: #e9ecef; color: #495057; padding: 4px 2px; border-radius: 5px; font-weight: 700; font-size: 1rem; flex: 1; text-align: center; border: 1px solid #dee2e6; }
-    </style>
+    .noise{
+      position:fixed; inset:0; pointer-events:none; z-index:-1;
+      opacity:.10;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+      background-size:180px 180px; mix-blend-mode:overlay;
+    }
+
+    .app{
+      height:100%;
+      display:grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+      padding: clamp(14px, 2.0vw, 22px);
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: var(--pad);
+      border-radius: var(--r);
+      background: linear-gradient(135deg, var(--glass), var(--glass2));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .h-left{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .iconWrap{
+      width: 48px; height: 48px;
+      border-radius: 16px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 26px rgba(0,0,0,.12);
+    }
+    .material-icons-outlined{ font-size: 26px; opacity:.92; }
+
+    .titleBlock{ min-width:0; }
+    .title{
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .sub{
+      margin-top:4px;
+      font-size: 12px;
+      letter-spacing: .16em;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    .clock{
+      display:flex;
+      align-items:baseline;
+      gap: 10px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .clock .hm{
+      font-size: clamp(34px, 4.5vw, 56px);
+      font-weight: 800;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+    .clock .sec{
+      font-size: clamp(16px, 2.0vw, 22px);
+      font-weight: 600;
+      letter-spacing: .14em;
+      color: var(--faint);
+      transform: translateY(-.15em);
+      min-width: 2ch;
+    }
+
+    .panel{
+      border-radius: var(--r);
+      background: linear-gradient(135deg, var(--glass), var(--glass2));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .topline{
+      padding: 10px var(--pad);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      color: var(--dim);
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .warn{
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(0,0,0,.12);
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      margin: 12px var(--pad) 0;
+      display:none;
+    }
+
+    .scrollArea{
+      height: calc(100% - 44px);
+      overflow:auto;
+      scrollbar-width: none;
+    }
+    .scrollArea::-webkit-scrollbar{ width:0; height:0; }
+
+    .list{
+      padding: var(--pad);
+      display:grid;
+      gap: 12px;
+    }
+
+    .card{
+      display:grid;
+      grid-template-columns: 110px 1fr 340px;
+      gap: 14px;
+      align-items:center;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 14px 40px rgba(0,0,0,.10);
+      min-height: 84px;
+    }
+
+    .lineBox{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      align-items:flex-start;
+    }
+    .lineNum{
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+    .company{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.86);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.10);
+    }
+    .dot{
+      width: 9px; height: 9px; border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(255,255,255,.10) inset;
+    }
+
+    .dest{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .destName{
+      font-size: 18px;
+      font-weight: 700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      letter-spacing: .02em;
+    }
+    .meta{
+      font-size: 12px;
+      color: var(--dim);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .times{
+      display:flex;
+      justify-content:flex-end;
+      gap: 12px;
+      align-items:center;
+      flex-wrap:nowrap;
+    }
+    .next{
+      min-width: 140px;
+      text-align:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--ok);
+      border: 1px solid var(--okBorder);
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+    }
+    .next .mins{
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      color: var(--okText);
+      line-height: 1.05;
+    }
+    .next .label{
+      margin-top: 4px;
+      font-size: 11px;
+      letter-spacing: .16em;
+      color: rgba(210,255,227,.78);
+      text-transform: uppercase;
+    }
+
+    .more{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      color: rgba(255,255,255,.74);
+      font-weight: 700;
+      letter-spacing: .10em;
+    }
+    .pill{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      min-width: 74px;
+      text-align:center;
+      font-size: 12px;
+    }
+
+    .empty{
+      padding: 28px;
+      color: var(--dim);
+      text-align:center;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 980px){
+      .card{ grid-template-columns: 96px 1fr; grid-template-rows:auto auto; }
+      .times{ grid-column: 1 / -1; justify-content:flex-start; }
+      .next{ min-width: 150px; }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="noise" aria-hidden="true"></div>
 
-<div class="header">
-    <div class="header-left">
-        <i class="material-icons">directions_bus</i>
-        <div class="title-group">
-            <span class="header-title">Painel de Horários</span>
-            <span class="header-subtitle"><i class="material-icons">place</i> Estação Central</span>
+  <div class="app">
+    <header>
+      <div class="h-left">
+        <div class="iconWrap"><span class="material-icons-outlined" aria-hidden="true">directions_bus</span></div>
+        <div class="titleBlock">
+          <div class="title">Estação Central</div>
+          <div class="sub" id="subStatus">Carregando…</div>
         </div>
-    </div>
-    <div class="header-right">
-        <span id="hora-atual">00:00</span>
-        <div id="data-atual" style="color: white; font-size: 0.8rem; font-weight: 700;"></div>
-    </div>
-</div>
+      </div>
 
-<div id="lista-horarios" class="lista-horarios"></div>
+      <div class="clock" aria-label="Relógio">
+        <div class="hm" id="hm">--:--</div>
+        <div class="sec" id="sec">--</div>
+      </div>
+    </header>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8"></script>
+    <section class="panel">
+      <div class="topline">
+        <div id="lastUpdate">—</div>
+        <div>Próximos horários • Next Bus</div>
+      </div>
 
-<script>
-let scrollInterval;
-let mapaAgrupado = new Map();
+      <div class="warn" id="apiWarn"></div>
 
-function atualizarRelogio() {
-    const agora = new Date();
-    document.getElementById('hora-atual').textContent = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-    document.getElementById('data-atual').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).toUpperCase();
-}
+      <div class="scrollArea" id="scrollArea">
+        <div class="list" id="list"></div>
+      </div>
+    </section>
+  </div>
 
-async function buscarDados() {
-    const estacaoCoord = { lat: -19.5368231, lng: -40.633973 };
-    const ds = new google.maps.DirectionsService();
-    mapaAgrupado.clear();
+  <script>
+    /*******************************************************************
+     * 🔑 INSIRA AQUI SUA GOOGLE MAPS API KEY (ÚNICO LUGAR)
+     *******************************************************************/
+    const GOOGLE_MAPS_API_KEY = "AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8";
+    // Exemplo:
+    // const GOOGLE_MAPS_API_KEY = "AIzaSy....";
 
-    // Cria 12 destinos ao redor da estação para cobrir todas as saídas
-    const pontosBusca = [];
-    for (let i = 0; i < 12; i++) {
-        const angulo = (i * 30) * (Math.PI / 180);
-        pontosBusca.push({
-            lat: estacaoCoord.lat + 0.03 * Math.sin(angulo),
-            lng: estacaoCoord.lng + 0.03 * Math.cos(angulo)
-        });
+    /*******************************************************************
+     * CONFIG (ponto fixo + varredura 360º)
+     *******************************************************************/
+    const STATION = { lat: -19.5368231, lng: -40.633973 };
+    const SWEEP_POINTS = 12;             // 12 pontos (a cada 30°)
+    const SWEEP_RADIUS_M = 1200;         // raio dos destinos “invisíveis” (ajuste: 800–2000m)
+    const REFRESH_EVERY_MS = 10 * 60 * 1000; // 10 min
+    const MAX_TIMES_PER_LINE = 4;        // 1 destaque + 3 seguintes
+
+    // Auto-scroll
+    const SCROLL_PX_PER_TICK = 1;        // pixel a pixel
+    const SCROLL_TICK_MS = 22;           // suavidade (menor = mais rápido)
+    const SCROLL_END_DELAY_MS = 5000;
+
+    /*******************************************************************
+     * UI refs
+     *******************************************************************/
+    const hmEl = document.getElementById("hm");
+    const secEl = document.getElementById("sec");
+    const listEl = document.getElementById("list");
+    const subStatusEl = document.getElementById("subStatus");
+    const lastUpdateEl = document.getElementById("lastUpdate");
+    const scrollAreaEl = document.getElementById("scrollArea");
+    const apiWarnEl = document.getElementById("apiWarn");
+
+    /*******************************************************************
+     * Clock
+     *******************************************************************/
+    function pad2(n){ return String(n).padStart(2,"0"); }
+    function tickClock(){
+      const d = new Date();
+      hmEl.textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      secEl.textContent = pad2(d.getSeconds());
+    }
+    function startClock(){
+      tickClock();
+      const ms = 1000 - new Date().getMilliseconds();
+      setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, ms);
     }
 
-    const promessas = pontosBusca.map(ponto => {
-        return new Promise((resolve) => {
-            ds.route({
-                origin: estacaoCoord,
-                destination: ponto,
-                travelMode: 'TRANSIT',
-                transitOptions: { departureTime: new Date(), routingPreference: 'FEWER_TRANSFERS' },
-                provideRouteAlternatives: true
-            }, (res, stat) => {
-                if (stat === 'OK') processarRotas(res.routes);
-                resolve();
-            });
-        });
-    });
+    /*******************************************************************
+     * Loader do Google Maps JS API (carrega via chave acima)
+     *******************************************************************/
+    function loadGoogleMaps(){
+      return new Promise((resolve, reject) => {
+        if (window.google?.maps) return resolve();
 
-    await Promise.all(promessas);
-    renderizar(ordenarDados());
-}
-
-function processarRotas(routes) {
-    routes.forEach(rota => {
-        const step = rota.legs[0].steps.find(s => s.transit);
-        if (step && step.transit) {
-            const t = step.transit;
-            const numero = t.line.short_name || t.line.name.split(' ')[0];
-            const chave = `${numero}-${t.headsign}`;
-
-            if (!mapaAgrupado.has(chave)) {
-                mapaAgrupado.set(chave, {
-                    numero: numero,
-                    destino: t.headsign,
-                    nomeLinha: t.line.name,
-                    horarios: []
-                });
-            }
-            const info = mapaAgrupado.get(chave);
-            if (!info.horarios.some(h => h.texto === t.departure_time.text)) {
-                info.horarios.push({ texto: t.departure_time.text, valor: t.departure_time.value.getTime() });
-            }
+        const key = (GOOGLE_MAPS_API_KEY || "").trim();
+        if (!key || key === "COLE_SUA_API_KEY_AQUI"){
+          apiWarnEl.style.display = "block";
+          apiWarnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY NA CONSTANTE 'GOOGLE_MAPS_API_KEY' (TOPO DO JS).";
+          return reject(new Error("Missing API key"));
         }
-    });
-}
 
-function ordenarDados() {
-    return Array.from(mapaAgrupado.values()).sort((a, b) => {
-        const minA = Math.min(...a.horarios.map(h => h.valor));
-        const minB = Math.min(...b.horarios.map(h => h.valor));
-        if (minA !== minB) return minA - minB;
-        return a.numero.localeCompare(b.numero, undefined, {numeric: true});
-    });
-}
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Falha ao carregar Google Maps JS API"));
+        document.head.appendChild(script);
+      });
+    }
 
-function renderizar(dados) {
-    const container = document.getElementById('lista-horarios');
-    if (dados.length === 0) {
-        container.innerHTML = `<div style="color:#666; text-align:center; padding:50px; font-size:1.5rem;">Sincronizando com Google Maps...</div>`;
+    /*******************************************************************
+     * Geodesia: destino por bearing + distância
+     *******************************************************************/
+    function toRad(deg){ return deg * Math.PI / 180; }
+    function toDeg(rad){ return rad * 180 / Math.PI; }
+
+    function destinationPoint(lat, lng, bearingDeg, distanceM){
+      const R = 6371000;
+      const brng = toRad(bearingDeg);
+      const dDivR = distanceM / R;
+      const lat1 = toRad(lat);
+      const lon1 = toRad(lng);
+
+      const lat2 = Math.asin(
+        Math.sin(lat1)*Math.cos(dDivR) +
+        Math.cos(lat1)*Math.sin(dDivR)*Math.cos(brng)
+      );
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng)*Math.sin(dDivR)*Math.cos(lat1),
+        Math.cos(dDivR) - Math.sin(lat1)*Math.sin(lat2)
+      );
+
+      return { lat: toDeg(lat2), lng: toDeg(lon2) };
+    }
+
+    function buildSweepDestinations(){
+      const points = [];
+      for (let i=0;i<SWEEP_POINTS;i++){
+        const bearing = i * (360 / SWEEP_POINTS);
+        points.push(destinationPoint(STATION.lat, STATION.lng, bearing, SWEEP_RADIUS_M));
+      }
+      return points;
+    }
+
+    /*******************************************************************
+     * Parsing do Directions (TRANSIT)
+     *******************************************************************/
+    function companyFromLineNumber(lineShort){
+      const n = parseInt(String(lineShort).replace(/\D/g,""), 10);
+      if (!Number.isFinite(n)) return { code:"VJD", color:"var(--vjd)" };
+      if (n >= 300 && n <= 499) return { code:"VSR", color:"var(--vsr)" };
+      return { code:"VJD", color:"var(--vjd)" };
+    }
+
+    function extractTripsFromDirectionsResult(result){
+      const trips = [];
+      if (!result?.routes?.length) return trips;
+
+      for (const route of result.routes){
+        const leg = route.legs?.[0];
+        if (!leg?.steps?.length) continue;
+
+        for (const step of leg.steps){
+          if (step.travel_mode !== "TRANSIT" || !step.transit) continue;
+
+          const td = step.transit;
+          const lineShort = td.line?.short_name || td.line?.name || "—";
+          const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
+          const dep = td.departure_time?.value; // epoch seconds
+          const arr = td.arrival_time?.value;   // epoch seconds
+          const depMs = dep ? dep * 1000 : null;
+          const arrMs = arr ? arr * 1000 : null;
+
+          const timeMs = arrMs || depMs;
+          if (!timeMs) continue;
+
+          trips.push({
+            line: String(lineShort),
+            destination: String(headsign),
+            timeMs,
+            key: `${String(lineShort)}|${String(headsign)}|${timeMs}`
+          });
+        }
+      }
+      return trips;
+    }
+
+    /*******************************************************************
+     * Dedup + Agrupamento + Ordenação
+     *******************************************************************/
+    function aggregateTrips(allTrips){
+      const uniqMap = new Map();
+      for (const t of allTrips) uniqMap.set(t.key, t);
+      const uniq = Array.from(uniqMap.values());
+
+      const groups = new Map();
+      for (const t of uniq){
+        const gKey = `${t.line}||${t.destination}`;
+        if (!groups.has(gKey)) groups.set(gKey, { line: t.line, destination: t.destination, times: [] });
+        groups.get(gKey).times.push(t.timeMs);
+      }
+
+      const cards = [];
+      for (const g of groups.values()){
+        g.times.sort((a,b) => a-b);
+        g.times = g.times.filter(ms => ms >= Date.now() - 30_000).slice(0, 4);
+        if (!g.times.length) continue;
+
+        cards.push({
+          line: g.line,
+          destination: g.destination,
+          times: g.times,
+          nextTime: g.times[0]
+        });
+      }
+
+      cards.sort((a,b) => a.nextTime - b.nextTime);
+      return cards;
+    }
+
+    function minsFromNow(ms){
+      const diff = Math.max(0, ms - Date.now());
+      return Math.round(diff / 60000);
+    }
+    function fmtHHMM(ms){
+      const d = new Date(ms);
+      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+
+    /*******************************************************************
+     * Render
+     *******************************************************************/
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function render(cards){
+      listEl.innerHTML = "";
+      if (!cards.length){
+        listEl.innerHTML = `<div class="empty">Nenhum horário encontrado no momento.</div>`;
         return;
+      }
+
+      const frag = document.createDocumentFragment();
+
+      for (const c of cards){
+        const company = companyFromLineNumber(c.line);
+        const nextMins = minsFromNow(c.times[0]);
+        const moreTimes = c.times.slice(1, 4).map(ms => `<div class="pill">${fmtHHMM(ms)}</div>`).join("");
+
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="lineBox">
+            <div class="lineNum">${escapeHtml(c.line)}</div>
+            <div class="company">
+              <span class="dot" style="background:${company.color}"></span>
+              <span>${company.code}</span>
+            </div>
+          </div>
+
+          <div class="dest">
+            <div class="destName">${escapeHtml(c.destination)}</div>
+            <div class="meta">Próximos: ${c.times.map(fmtHHMM).join(" • ")}</div>
+          </div>
+
+          <div class="times">
+            <div class="next">
+              <div class="mins">${nextMins} min</div>
+              <div class="label">Chegada</div>
+            </div>
+            <div class="more">
+              ${moreTimes}
+            </div>
+          </div>
+        `;
+        frag.appendChild(el);
+      }
+
+      listEl.appendChild(frag);
     }
 
-    container.innerHTML = dados.map(item => {
-        const hOrd = item.horarios.sort((a,b) => a.valor - b.valor);
-        const n = parseInt(item.numero) || 0;
-        const ehSR = (n >= 300 && n <= 499);
-        const cor = ehSR ? "var(--vsr-color)" : "var(--vjd-color)";
-        const sigla = ehSR ? "VSR" : "VJD";
+    /*******************************************************************
+     * Auto-scroll suave
+     *******************************************************************/
+    let scrollTimer = null;
+    let endDelayTimer = null;
 
-        return `
-            <div class="linha-item">
-                <div class="indicador-empresa" style="background: ${cor}"></div>
-                <div class="numero-box">${item.numero}</div>
-                <div class="detalhes">
-                    <div class="destino-texto">${item.destino}</div>
-                    <div class="linha-info-container">
-                        <span class="empresa-badge" style="background: ${cor}">${sigla}</span>
-                        <span class="linha-sub">Linha: ${item.nomeLinha}</span>
-                    </div>
-                </div>
-                <div class="tempo-container">
-                    <div class="tempo-destaque">${hOrd[0].texto}</div>
-                    <div class="lista-proximos">
-                        ${hOrd.slice(1, 4).map(f => `<div class="pila-horario">${f.texto}</div>`).join('')}
-                    </div>
-                </div>
-            </div>`;
-    }).join('');
+    function stopAutoScroll(){
+      if (scrollTimer) clearInterval(scrollTimer);
+      if (endDelayTimer) clearTimeout(endDelayTimer);
+      scrollTimer = null;
+      endDelayTimer = null;
+    }
 
-    container.scrollTop = 0;
-    setTimeout(iniciarAutoScroll, 2000);
-}
+    function startAutoScroll(){
+      stopAutoScroll();
+      const el = scrollAreaEl;
 
-function iniciarAutoScroll() {
-    const container = document.getElementById('lista-horarios');
-    if (scrollInterval) clearInterval(scrollInterval);
-    
-    scrollInterval = setInterval(() => {
-        const fim = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
-        if (fim) {
-            clearInterval(scrollInterval);
-            setTimeout(() => {
-                container.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(iniciarAutoScroll, 1000);
-            }, 5000);
-        } else {
-            container.scrollTop += 1;
+      scrollTimer = setInterval(() => {
+        const maxScroll = el.scrollHeight - el.clientHeight;
+        if (maxScroll <= 0) return;
+
+        el.scrollTop += 1;
+
+        if (el.scrollTop >= maxScroll){
+          stopAutoScroll();
+          endDelayTimer = setTimeout(() => {
+            el.scrollTop = 0;
+            startAutoScroll();
+          }, SCROLL_END_DELAY_MS);
         }
-    }, 40);
-}
+      }, SCROLL_TICK_MS);
+    }
 
-setInterval(atualizarRelogio, 1000);
-setInterval(buscarDados, 600000);
-window.onload = () => { atualizarRelogio(); buscarDados(); };
-</script>
+    /*******************************************************************
+     * Directions: 12 requisições simultâneas
+     *******************************************************************/
+    let directionsService = null;
+    let refreshTimer = null;
+
+    function setStatus(text){ subStatusEl.textContent = text; }
+
+    function requestDirectionsTo(dest){
+      return new Promise((resolve) => {
+        const req = {
+          origin: STATION,
+          destination: dest,
+          travelMode: google.maps.TravelMode.TRANSIT,
+          provideRouteAlternatives: true,
+          transitOptions: { departureTime: new Date() }
+        };
+
+        directionsService.route(req, (result, status) => {
+          if (status === "OK" && result) resolve({ ok:true, result });
+          else resolve({ ok:false, status });
+        });
+      });
+    }
+
+    async function refreshData(){
+      setStatus("Buscando linhas (varredura 360º)…");
+      const t0 = performance.now();
+
+      if (!directionsService) directionsService = new google.maps.DirectionsService();
+
+      const destinations = buildSweepDestinations();
+      const responses = await Promise.all(destinations.map(d => requestDirectionsTo(d)));
+
+      const allTrips = [];
+      let okCount = 0;
+
+      for (const r of responses){
+        if (r.ok){
+          okCount++;
+          allTrips.push(...extractTripsFromDirectionsResult(r.result));
+        }
+      }
+
+      const cards = aggregateTrips(allTrips);
+      render(cards);
+
+      const dt = Math.round(performance.now() - t0);
+      const now = new Date();
+      lastUpdateEl.textContent = `Última atualização • ${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
+
+      if (!okCount){
+        setStatus("Sem resposta da API (verifique a KEY e restrições).");
+      } else {
+        setStatus(`Linhas: ${cards.length} • OK: ${okCount}/12 • ${dt}ms`);
+      }
+
+      startAutoScroll();
+    }
+
+    function scheduleRefresh(){
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(refreshData, REFRESH_EVERY_MS);
+    }
+
+    /*******************************************************************
+     * BOOT
+     *******************************************************************/
+    startClock();
+
+    (async function boot(){
+      try{
+        setStatus("Carregando Google Maps…");
+        await loadGoogleMaps();
+        apiWarnEl.style.display = "none";
+        setStatus("Atualizando linhas…");
+        await refreshData();
+        scheduleRefresh();
+      }catch(err){
+        setStatus("Aguardando API Key…");
+        console.warn(err);
+      }
+    })();
+  </script>
 </body>
 </html>
