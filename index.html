@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Painel de Horários • Estação Central</title>
 
-  <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
-  <!-- Fonte (simples e bem legível) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -27,7 +25,6 @@
       --muted:#475569;
 
       --green:#22c55e;
-      --greenDark:#16a34a;
 
       --vjd:#1e3a8a;
       --vsr:#0ea5e9;
@@ -49,7 +46,6 @@
       overflow:hidden;
     }
 
-    /* HEADER (estilo do anexo) */
     .header{
       height: 120px;
       padding: 18px 22px;
@@ -61,12 +57,7 @@
       border-bottom: 4px solid var(--yellow);
     }
 
-    .h-left{
-      display:flex;
-      align-items:center;
-      gap: 16px;
-      min-width: 0;
-    }
+    .h-left{ display:flex; align-items:center; gap: 16px; min-width: 0; }
 
     .h-icon{
       width: 54px; height:54px;
@@ -77,12 +68,7 @@
     }
     .h-icon .material-icons-outlined{ font-size:30px; }
 
-    .h-titles{
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-      min-width:0;
-    }
+    .h-titles{ display:flex; flex-direction:column; gap: 6px; min-width:0; }
     .h-title{
       font-size: clamp(24px, 3.0vw, 38px);
       font-weight: 800;
@@ -105,7 +91,6 @@
     }
     .h-sub .material-icons-outlined{ font-size:20px; opacity:.95; }
 
-    /* relógio no canto (como no anexo) */
     .clockBox{
       min-width: 290px;
       text-align:right;
@@ -134,7 +119,6 @@
       text-overflow:ellipsis;
     }
 
-    /* CONTEÚDO */
     .main{
       height: calc(100% - 120px);
       padding: 18px 22px;
@@ -156,9 +140,12 @@
       letter-spacing: .10em;
       text-transform: uppercase;
       color: var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 55vw;
     }
 
-    /* progress bar de troca de página */
     .pager{
       display:flex;
       align-items:center;
@@ -187,9 +174,7 @@
       transition: width 120ms linear;
     }
 
-    /* LISTA / PÁGINA */
     .pageWrap{
-      background: transparent;
       overflow:hidden;
       display:grid;
       align-content:start;
@@ -209,7 +194,6 @@
       text-transform: uppercase;
     }
 
-    /* CARD simples (estilo do anexo) */
     .card{
       background: var(--card);
       border: 1px solid var(--stroke);
@@ -223,7 +207,6 @@
       position:relative;
     }
 
-    /* “faixa” azul na esquerda */
     .card::before{
       content:"";
       position:absolute;
@@ -248,7 +231,6 @@
       color: #111827;
     }
 
-    /* badge (mantém glass, mas discreto) */
     .badge{
       display:inline-flex;
       align-items:center;
@@ -272,14 +254,8 @@
       box-shadow: 0 0 0 2px rgba(15,23,42,.06) inset;
     }
 
-    .midCol{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-    }
+    .midCol{ min-width:0; display:flex; flex-direction:column; gap: 8px; }
 
-    /* ✅ Destino maior (mais legível) */
     .destName{
       font-size: clamp(22px, 2.4vw, 34px);
       font-weight: 900;
@@ -309,7 +285,6 @@
       gap: 10px;
     }
 
-    /* destaque do próximo horário (HH:MM) */
     .nextTime{
       width: 100%;
       display:flex;
@@ -322,7 +297,7 @@
       font-weight: 900;
       font-size: 40px;
       letter-spacing: .02em;
-      box-shadow: 0 10px 18px rgba(34,197,94,.25);
+      box-shadow: 0 10px 18px rgba(34,197,94,.22);
     }
 
     .moreRow{
@@ -357,15 +332,16 @@
       padding: 0 2px;
     }
 
-    /* Responsivo */
     @media (max-width: 980px){
+      body{ overflow:auto; }
       .header{ height:auto; flex-direction:column; align-items:flex-start; gap: 14px; }
       .clockBox{ width:100%; text-align:left; }
       .main{ height:auto; }
-      body{ overflow:auto; }
       .card{ grid-template-columns: 1fr; }
       .timeCol{ align-items:flex-start; }
       .moreRow{ justify-content:flex-start; }
+      .pager{ min-width: 0; }
+      .bar{ width: 160px; }
     }
   </style>
 </head>
@@ -420,13 +396,13 @@
     const SWEEP_POINTS = 12;
     const SWEEP_RADIUS_M = 1200;
 
-    const REFRESH_EVERY_MS = 10 * 60 * 1000; // 10 min
-    const WINDOW_NEXT_HOURS = 2;             // próximas 2h
-    const MAX_TIMES_PER_LINE = 4;            // 1 destaque + 3 próximos
+    const REFRESH_EVERY_MS = 10 * 60 * 1000;
+    const WINDOW_NEXT_HOURS = 2;
+    const MAX_TIMES_PER_LINE = 4;
 
-    // Paginação (substitui scroll)
-    const ITEMS_PER_PAGE = 6;                // quantos cards por tela
-    const PAGE_DURATION_MS = 12000;          // troca automática (12s)
+    // Paginação automática (tempo fixo, quantidade dinâmica)
+    const MIN_ITEMS_PER_PAGE = 4;          // ✅ mínimo garantido
+    const PAGE_DURATION_MS = 12000;        // troca automática (12s)
 
     /*******************************************************************
      * UI refs
@@ -440,7 +416,7 @@
     const clockDateEl = document.getElementById("clockDate");
 
     /*******************************************************************
-     * Clock (SEM segundos) + data (simples)
+     * Clock (SEM segundos) + data
      *******************************************************************/
     const weekday = ["DOMINGO","SEGUNDA","TERÇA","QUARTA","QUINTA","SEXTA","SÁBADO"];
     const month   = ["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"];
@@ -471,7 +447,6 @@
         }
 
         window.__gmReady = () => resolve();
-
         const script = document.createElement("script");
         script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=__gmReady`;
         script.async = true;
@@ -516,13 +491,11 @@
     }
 
     /*******************************************************************
-     * Helpers: tempo do Maps (Date vs number) — robusto
+     * Helpers tempo Maps
      *******************************************************************/
     function normalizeTimeValue(value){
       if (value instanceof Date) return value.getTime();
-      if (typeof value === "number" && Number.isFinite(value)){
-        return value < 1e12 ? value * 1000 : value;
-      }
+      if (typeof value === "number" && Number.isFinite(value)) return value < 1e12 ? value * 1000 : value;
       const n = Number(value);
       if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n;
       return null;
@@ -612,7 +585,7 @@
     }
 
     /*******************************************************************
-     * Directions runner (12 requests)
+     * Directions runner
      *******************************************************************/
     let directionsService = null;
 
@@ -634,13 +607,22 @@
     }
 
     /*******************************************************************
-     * PAGINAÇÃO automática + barra
+     * PAGINAÇÃO dinâmica (quantidade baseada no espaço disponível)
      *******************************************************************/
     let allCards = [];
     let currentPage = 0;
     let pageTimer = null;
     let barTimer = null;
     let pageStartTs = 0;
+
+    let itemsPerPage = MIN_ITEMS_PER_PAGE;
+    let cardHeightCache = null;
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
 
     function stopPager(){
       if (pageTimer) clearInterval(pageTimer);
@@ -650,75 +632,116 @@
     }
 
     function pageCount(){
-      return Math.max(1, Math.ceil(allCards.length / ITEMS_PER_PAGE));
+      return Math.max(1, Math.ceil(allCards.length / itemsPerPage));
+    }
+
+    function buildCardElement(c){
+      const company = companyFromLineNumber(c.line);
+      const nextClock = fmtHHMM(c.times[0]);
+      const more = c.times.slice(1, 4);
+
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = `
+        <div class="lineCol">
+          <div class="lineNum">${escapeHtml(c.line)}</div>
+          <div class="badge">
+            <span class="dot" style="background:${company.color}"></span>
+            <span>${company.code}</span>
+          </div>
+        </div>
+
+        <div class="midCol">
+          <div class="destName" title="${escapeHtml(c.destination)}">${escapeHtml(c.destination)}</div>
+          <div class="meta">Próximo: ${nextClock}</div>
+        </div>
+
+        <div class="timeCol">
+          <div class="nextTime">${nextClock}</div>
+          <div class="moreRow">
+            ${more.length ? more.map(ms => `<div class="pill">${fmtHHMM(ms)}</div>`).join("") : `<div class="pill" style="opacity:.6">—</div>`}
+          </div>
+        </div>
+      `;
+      return el;
+    }
+
+    function getGapPx(){
+      const cs = getComputedStyle(pageWrapEl);
+      // "gap" pode vir "14px" ou "14px 14px"
+      const gap = (cs.gap || cs.rowGap || "0px").split(" ")[0];
+      const n = parseFloat(gap);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function measureCardHeight(){
+      if (cardHeightCache) return cardHeightCache;
+
+      // Se não houver cards ainda, cria um “mock” temporário para medir
+      const mockData = allCards[0] || { line: "000", destination: "DESTINO DE EXEMPLO", times: [Date.now()+600000, Date.now()+1200000, Date.now()+1800000, Date.now()+2400000] };
+      const el = buildCardElement(mockData);
+      el.style.visibility = "hidden";
+      el.style.position = "absolute";
+      el.style.left = "-9999px";
+      el.style.top = "0";
+      document.body.appendChild(el);
+
+      const h = el.getBoundingClientRect().height;
+      document.body.removeChild(el);
+
+      cardHeightCache = h;
+      return h;
+    }
+
+    function computeItemsPerPage(){
+      // altura disponível dentro do container da página
+      const available = pageWrapEl.getBoundingClientRect().height;
+      const gap = getGapPx();
+      const cardH = measureCardHeight();
+
+      // Fórmula: n*cardH + (n-1)*gap <= available  => n <= (available+gap)/(cardH+gap)
+      const raw = Math.floor((available + gap) / (cardH + gap));
+
+      // mínimo 4, e se tiver menos cards que isso, mostra o que tiver
+      const clamped = Math.max(MIN_ITEMS_PER_PAGE, raw);
+      itemsPerPage = Math.max(1, Math.min(clamped, allCards.length || clamped));
     }
 
     function renderPage(pageIndex){
+      computeItemsPerPage();
       const totalPages = pageCount();
+
       currentPage = ((pageIndex % totalPages) + totalPages) % totalPages;
-
-      const start = currentPage * ITEMS_PER_PAGE;
-      const slice = allCards.slice(start, start + ITEMS_PER_PAGE);
-
       pageLabelEl.textContent = `PÁGINA ${currentPage + 1}/${totalPages}`;
-      pageWrapEl.innerHTML = "";
 
+      const start = currentPage * itemsPerPage;
+      const slice = allCards.slice(start, start + itemsPerPage);
+
+      pageWrapEl.innerHTML = "";
       if (!slice.length){
         pageWrapEl.innerHTML = `<div class="empty">Sem horários nas próximas ${WINDOW_NEXT_HOURS} horas.</div>`;
         return;
       }
 
       const frag = document.createDocumentFragment();
-
-      for (const c of slice){
-        const company = companyFromLineNumber(c.line);
-        const nextClock = fmtHHMM(c.times[0]);
-        const more = c.times.slice(1, 4);
-
-        const el = document.createElement("div");
-        el.className = "card";
-        el.innerHTML = `
-          <div class="lineCol">
-            <div class="lineNum">${escapeHtml(c.line)}</div>
-            <div class="badge">
-              <span class="dot" style="background:${company.color}"></span>
-              <span>${company.code}</span>
-            </div>
-          </div>
-
-          <div class="midCol">
-            <div class="destName" title="${escapeHtml(c.destination)}">${escapeHtml(c.destination)}</div>
-            <div class="meta">Próximo: ${nextClock}</div>
-          </div>
-
-          <div class="timeCol">
-            <div class="nextTime">${nextClock}</div>
-            <div class="moreRow">
-              ${more.length ? more.map(ms => `<div class="pill">${fmtHHMM(ms)}</div>`).join("") : `<div class="pill" style="opacity:.6">—</div>`}
-            </div>
-          </div>
-        `;
-        frag.appendChild(el);
-      }
-
+      for (const c of slice) frag.appendChild(buildCardElement(c));
       pageWrapEl.appendChild(frag);
     }
 
     function startPager(){
       stopPager();
+      cardHeightCache = null; // recalcula caso a TV/layout tenha mudado
       renderPage(0);
 
       pageStartTs = performance.now();
       barFillEl.style.width = "0%";
 
-      // barra (atualiza ~10x/s)
       barTimer = setInterval(() => {
         const elapsed = performance.now() - pageStartTs;
         const pct = Math.min(100, (elapsed / PAGE_DURATION_MS) * 100);
         barFillEl.style.width = pct.toFixed(1) + "%";
       }, 100);
 
-      // troca de página
       pageTimer = setInterval(() => {
         pageStartTs = performance.now();
         barFillEl.style.width = "0%";
@@ -726,21 +749,21 @@
       }, PAGE_DURATION_MS);
     }
 
-    /*******************************************************************
-     * Render helpers
-     *******************************************************************/
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, (m) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
+    // Recalcula quantidade de itens quando a tela muda (TV, zoom, resolução)
+    let resizeRaf = null;
+    window.addEventListener("resize", () => {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        if (!allCards.length) return;
+        startPager(); // reinicia com novo cálculo
+      });
+    });
 
     /*******************************************************************
      * Refresh data
      *******************************************************************/
     async function refreshData(){
       statusEl.textContent = "Buscando linhas…";
-      const t0 = performance.now();
 
       if (!directionsService) directionsService = new google.maps.DirectionsService();
 
@@ -762,12 +785,8 @@
       lastUpdateEl.textContent = `Atualizado • ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
       statusEl.textContent = ok ? `Linhas exibidas: ${allCards.length} • Janela: ${WINDOW_NEXT_HOURS}h` : "Sem resposta da API (verifique key/restrições).";
 
-      // reinicia paginação sempre que atualizar os dados (mantém claro e previsível)
+      // reinicia paginação sempre que atualizar os dados
       startPager();
-
-      const dt = Math.round(performance.now() - t0);
-      // (dt fica só no console para não poluir a tela)
-      console.log("refreshData ms:", dt, "cards:", allCards.length, "ok:", ok);
     }
 
     function scheduleRefresh(){
@@ -782,7 +801,6 @@
     (async function boot(){
       try{
         await loadGoogleMaps();
-        statusEl.textContent = "Atualizando…";
         await refreshData();
         scheduleRefresh();
       }catch(err){
