@@ -10,7 +10,7 @@
   <!-- Fonte -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -23,11 +23,11 @@
 
       --text: rgba(255,255,255,.92);
       --dim: rgba(255,255,255,.70);
-      --faint: rgba(255,255,255,.50);
+      --faint: rgba(255,255,255,.52);
 
-      --ok: rgba(74, 222, 128, .18);
-      --okBorder: rgba(74, 222, 128, .40);
-      --okText: rgba(210, 255, 227, .95);
+      --okBg: rgba(74, 222, 128, .16);
+      --okBorder: rgba(74, 222, 128, .35);
+      --okText: rgba(220, 255, 235, .96);
 
       --vjd: rgba(16, 65, 130, .95);   /* azul escuro */
       --vsr: rgba(96, 190, 255, .95);  /* azul claro */
@@ -45,15 +45,16 @@
       margin:0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
-      background: radial-gradient(1200px 900px at 30% 15%, rgba(90,170,255,.20) 0%, rgba(10,46,62,0) 65%),
-                  radial-gradient(900px 700px at 75% 75%, rgba(85,230,205,.12) 0%, rgba(6,18,24,0) 70%),
-                  radial-gradient(1400px 1100px at 50% 55%, var(--bg1) 0%, var(--bg0) 62%, #040a0f 100%);
+      background:
+        radial-gradient(1200px 900px at 30% 15%, rgba(90,170,255,.18) 0%, rgba(10,46,62,0) 65%),
+        radial-gradient(900px 700px at 75% 75%, rgba(85,230,205,.10) 0%, rgba(6,18,24,0) 70%),
+        radial-gradient(1400px 1100px at 50% 55%, var(--bg1) 0%, var(--bg0) 62%, #040a0f 100%);
       overflow:hidden;
     }
 
     .noise{
       position:fixed; inset:0; pointer-events:none; z-index:-1;
-      opacity:.10;
+      opacity:.08;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
       background-size:180px 180px; mix-blend-mode:overlay;
     }
@@ -66,6 +67,7 @@
       padding: clamp(14px, 2.0vw, 22px);
     }
 
+    /* Header: sinalização digital */
     header{
       display:flex;
       align-items:center;
@@ -99,7 +101,7 @@
     .titleBlock{ min-width:0; }
     .title{
       font-size: clamp(18px, 2.2vw, 26px);
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: .08em;
       text-transform: uppercase;
       white-space:nowrap;
@@ -109,15 +111,15 @@
     .sub{
       margin-top:4px;
       font-size: 12px;
-      letter-spacing: .16em;
+      letter-spacing: .14em;
       color: var(--dim);
       text-transform: uppercase;
     }
 
+    /* Relógio SEM segundos */
     .clock{
       display:flex;
       align-items:baseline;
-      gap: 10px;
       user-select:none;
       white-space:nowrap;
     }
@@ -127,15 +129,8 @@
       letter-spacing: .02em;
       line-height: 1;
     }
-    .clock .sec{
-      font-size: clamp(16px, 2.0vw, 22px);
-      font-weight: 600;
-      letter-spacing: .14em;
-      color: var(--faint);
-      transform: translateY(-.15em);
-      min-width: 2ch;
-    }
 
+    /* Painel */
     .panel{
       border-radius: var(--r);
       background: linear-gradient(135deg, var(--glass), var(--glass2));
@@ -185,27 +180,28 @@
       gap: 12px;
     }
 
+    /* Card: leitura confortável */
     .card{
       display:grid;
-      grid-template-columns: 110px 1fr 340px;
-      gap: 14px;
+      grid-template-columns: 130px 1fr 320px;
+      gap: 16px;
       align-items:center;
-      padding: 14px 16px;
+      padding: 16px 18px;
       border-radius: 18px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: 0 14px 40px rgba(0,0,0,.10);
-      min-height: 84px;
+      min-height: 96px;
     }
 
     .lineBox{
       display:flex;
       flex-direction:column;
-      gap: 8px;
+      gap: 10px; /* badge abaixo do número */
       align-items:flex-start;
     }
     .lineNum{
-      font-size: 34px;
+      font-size: 40px;
       font-weight: 800;
       letter-spacing: .02em;
       line-height: 1;
@@ -232,7 +228,7 @@
       min-width:0;
       display:flex;
       flex-direction:column;
-      gap: 6px;
+      gap: 8px;
     }
     .destName{
       font-size: 18px;
@@ -245,60 +241,66 @@
     .meta{
       font-size: 12px;
       color: var(--dim);
-      letter-spacing: .08em;
+      letter-spacing: .10em;
       text-transform: uppercase;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
+    /* Horários: destaque + abaixo os próximos */
     .times{
       display:flex;
-      justify-content:flex-end;
-      gap: 12px;
-      align-items:center;
-      flex-wrap:nowrap;
+      flex-direction:column;
+      align-items:flex-end;
+      gap: 10px;
     }
     .next{
-      min-width: 140px;
-      text-align:center;
-      padding: 10px 12px;
+      width: 100%;
+      max-width: 320px;
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      padding: 12px 14px;
       border-radius: 14px;
-      background: var(--ok);
+      background: var(--okBg);
       border: 1px solid var(--okBorder);
       box-shadow: 0 16px 40px rgba(0,0,0,.12);
     }
     .next .mins{
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
       letter-spacing: .02em;
       color: var(--okText);
-      line-height: 1.05;
+      line-height: 1;
     }
-    .next .label{
-      margin-top: 4px;
-      font-size: 11px;
-      letter-spacing: .16em;
-      color: rgba(210,255,227,.78);
+    .next .when{
+      font-size: 12px;
+      letter-spacing: .14em;
+      color: rgba(220,255,235,.78);
       text-transform: uppercase;
+      font-weight: 700;
+      white-space:nowrap;
     }
 
-    .more{
+    .moreRow{
+      width: 100%;
       display:flex;
       gap: 10px;
-      align-items:center;
-      color: rgba(255,255,255,.74);
-      font-weight: 700;
-      letter-spacing: .10em;
+      justify-content:flex-end;
+      flex-wrap:nowrap;
     }
     .pill{
       padding: 8px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.05);
-      min-width: 74px;
+      min-width: 86px;
       text-align:center;
       font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .10em;
+      color: rgba(255,255,255,.74);
     }
 
     .empty{
@@ -310,9 +312,10 @@
     }
 
     @media (max-width: 980px){
-      .card{ grid-template-columns: 96px 1fr; grid-template-rows:auto auto; }
-      .times{ grid-column: 1 / -1; justify-content:flex-start; }
-      .next{ min-width: 150px; }
+      .card{ grid-template-columns: 1fr; }
+      .times{ align-items:flex-start; }
+      .next, .moreRow{ max-width: none; }
+      .moreRow{ justify-content:flex-start; }
     }
   </style>
 </head>
@@ -332,14 +335,13 @@
 
       <div class="clock" aria-label="Relógio">
         <div class="hm" id="hm">--:--</div>
-        <div class="sec" id="sec">--</div>
       </div>
     </header>
 
     <section class="panel">
       <div class="topline">
         <div id="lastUpdate">—</div>
-        <div>Próximos horários • Next Bus</div>
+        <div>Próximos horários • Janela 2h</div>
       </div>
 
       <div class="warn" id="apiWarn"></div>
@@ -354,29 +356,28 @@
     /*******************************************************************
      * 🔑 INSIRA AQUI SUA GOOGLE MAPS API KEY (ÚNICO LUGAR)
      *******************************************************************/
-    const GOOGLE_MAPS_API_KEY = "AIzaSyA5jfERk5m06bl0eQnFLWSYbFhsQFglyO8";
-    // Exemplo:
-    // const GOOGLE_MAPS_API_KEY = "AIzaSy....";
+    const GOOGLE_MAPS_API_KEY = "COLE_SUA_API_KEY_AQUI";
 
     /*******************************************************************
-     * CONFIG (ponto fixo + varredura 360º)
+     * CONFIG
      *******************************************************************/
     const STATION = { lat: -19.5368231, lng: -40.633973 };
-    const SWEEP_POINTS = 12;             // 12 pontos (a cada 30°)
-    const SWEEP_RADIUS_M = 1200;         // raio dos destinos “invisíveis” (ajuste: 800–2000m)
+    const SWEEP_POINTS = 12;
+    const SWEEP_RADIUS_M = 1200;
+
     const REFRESH_EVERY_MS = 10 * 60 * 1000; // 10 min
-    const MAX_TIMES_PER_LINE = 4;        // 1 destaque + 3 seguintes
+    const MAX_TIMES_PER_LINE = 4;            // 1 destaque + 3 seguintes
+    const WINDOW_NEXT_HOURS = 2;             // ✅ somente próximas 2h
 
     // Auto-scroll
-    const SCROLL_PX_PER_TICK = 1;        // pixel a pixel
-    const SCROLL_TICK_MS = 22;           // suavidade (menor = mais rápido)
+    const SCROLL_PX_PER_TICK = 1;
+    const SCROLL_TICK_MS = 22;
     const SCROLL_END_DELAY_MS = 5000;
 
     /*******************************************************************
      * UI refs
      *******************************************************************/
     const hmEl = document.getElementById("hm");
-    const secEl = document.getElementById("sec");
     const listEl = document.getElementById("list");
     const subStatusEl = document.getElementById("subStatus");
     const lastUpdateEl = document.getElementById("lastUpdate");
@@ -384,13 +385,12 @@
     const apiWarnEl = document.getElementById("apiWarn");
 
     /*******************************************************************
-     * Clock
+     * Clock (SEM segundos)
      *******************************************************************/
     function pad2(n){ return String(n).padStart(2,"0"); }
     function tickClock(){
       const d = new Date();
       hmEl.textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-      secEl.textContent = pad2(d.getSeconds());
     }
     function startClock(){
       tickClock();
@@ -399,7 +399,7 @@
     }
 
     /*******************************************************************
-     * Loader do Google Maps JS API (carrega via chave acima)
+     * Loader Google Maps JS API
      *******************************************************************/
     function loadGoogleMaps(){
       return new Promise((resolve, reject) => {
@@ -412,12 +412,17 @@
           return reject(new Error("Missing API key"));
         }
 
+        window.__gmReady = () => resolve();
+
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=__gmReady`;
         script.async = true;
         script.defer = true;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("Falha ao carregar Google Maps JS API"));
+        script.onerror = () => {
+          apiWarnEl.style.display = "block";
+          apiWarnEl.textContent = "Falha ao carregar Google Maps JS API. Verifique KEY, restrições de domínio e internet.";
+          reject(new Error("Failed to load Google Maps"));
+        };
         document.head.appendChild(script);
       });
     }
@@ -457,6 +462,26 @@
     }
 
     /*******************************************************************
+     * Helpers: tempo vindo do Maps (Date vs number)
+     * ✅ Corrige o bug do "min" enorme
+     *******************************************************************/
+    function normalizeTimeValue(value){
+      // Maps JS normalmente retorna Date
+      if (value instanceof Date) return value.getTime();
+
+      // Às vezes vem como objeto tipo { value: Date } já tratado acima no caller,
+      // mas garantimos aqui caso venha number/string:
+      if (typeof value === "number" && Number.isFinite(value)){
+        // se for “seconds since epoch” (1e9~), converte; se for ms (1e12~), mantém
+        return value < 1e12 ? value * 1000 : value;
+      }
+      const n = Number(value);
+      if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n;
+
+      return null;
+    }
+
+    /*******************************************************************
      * Parsing do Directions (TRANSIT)
      *******************************************************************/
     function companyFromLineNumber(lineShort){
@@ -480,12 +505,12 @@
           const td = step.transit;
           const lineShort = td.line?.short_name || td.line?.name || "—";
           const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
-          const dep = td.departure_time?.value; // epoch seconds
-          const arr = td.arrival_time?.value;   // epoch seconds
-          const depMs = dep ? dep * 1000 : null;
-          const arrMs = arr ? arr * 1000 : null;
 
-          const timeMs = arrMs || depMs;
+          const depVal = td.departure_time?.value ?? null;
+          const arrVal = td.arrival_time?.value ?? null;
+
+          // prefer arrival, fallback departure
+          const timeMs = normalizeTimeValue(arrVal) ?? normalizeTimeValue(depVal);
           if (!timeMs) continue;
 
           trips.push({
@@ -500,15 +525,23 @@
     }
 
     /*******************************************************************
-     * Dedup + Agrupamento + Ordenação
+     * Dedup + Janela 2h + Agrupamento + Ordenação
      *******************************************************************/
     function aggregateTrips(allTrips){
+      const now = Date.now();
+      const windowEnd = now + WINDOW_NEXT_HOURS * 60 * 60 * 1000;
+
+      // remove duplicatas
       const uniqMap = new Map();
       for (const t of allTrips) uniqMap.set(t.key, t);
       const uniq = Array.from(uniqMap.values());
 
+      // ✅ mantém apenas dentro da janela (próximas 2h)
+      const filtered = uniq.filter(t => t.timeMs >= now - 30_000 && t.timeMs <= windowEnd);
+
+      // agrupa por linha+destino
       const groups = new Map();
-      for (const t of uniq){
+      for (const t of filtered){
         const gKey = `${t.line}||${t.destination}`;
         if (!groups.has(gKey)) groups.set(gKey, { line: t.line, destination: t.destination, times: [] });
         groups.get(gKey).times.push(t.timeMs);
@@ -517,7 +550,7 @@
       const cards = [];
       for (const g of groups.values()){
         g.times.sort((a,b) => a-b);
-        g.times = g.times.filter(ms => ms >= Date.now() - 30_000).slice(0, 4);
+        g.times = g.times.slice(0, MAX_TIMES_PER_LINE);
         if (!g.times.length) continue;
 
         cards.push({
@@ -533,8 +566,8 @@
     }
 
     function minsFromNow(ms){
-      const diff = Math.max(0, ms - Date.now());
-      return Math.round(diff / 60000);
+      const diff = ms - Date.now();
+      return Math.max(0, Math.round(diff / 60000));
     }
     function fmtHHMM(ms){
       const d = new Date(ms);
@@ -542,7 +575,7 @@
     }
 
     /*******************************************************************
-     * Render
+     * Render (próximos abaixo do destaque)
      *******************************************************************/
     function escapeHtml(s){
       return String(s).replace(/[&<>"']/g, (m) => ({
@@ -552,8 +585,9 @@
 
     function render(cards){
       listEl.innerHTML = "";
+
       if (!cards.length){
-        listEl.innerHTML = `<div class="empty">Nenhum horário encontrado no momento.</div>`;
+        listEl.innerHTML = `<div class="empty">Sem horários nas próximas ${WINDOW_NEXT_HOURS} horas.</div>`;
         return;
       }
 
@@ -561,7 +595,11 @@
 
       for (const c of cards){
         const company = companyFromLineNumber(c.line);
-        const nextMins = minsFromNow(c.times[0]);
+
+        const nextMs = c.times[0];
+        const nextMins = minsFromNow(nextMs);
+        const nextClock = fmtHHMM(nextMs);
+
         const moreTimes = c.times.slice(1, 4).map(ms => `<div class="pill">${fmtHHMM(ms)}</div>`).join("");
 
         const el = document.createElement("div");
@@ -577,16 +615,16 @@
 
           <div class="dest">
             <div class="destName">${escapeHtml(c.destination)}</div>
-            <div class="meta">Próximos: ${c.times.map(fmtHHMM).join(" • ")}</div>
+            <div class="meta">Próximo às ${nextClock}</div>
           </div>
 
           <div class="times">
             <div class="next">
               <div class="mins">${nextMins} min</div>
-              <div class="label">Chegada</div>
+              <div class="when">${nextClock}</div>
             </div>
-            <div class="more">
-              ${moreTimes}
+            <div class="moreRow">
+              ${moreTimes || `<div class="pill" style="opacity:.6">—</div>`}
             </div>
           </div>
         `;
@@ -617,7 +655,7 @@
         const maxScroll = el.scrollHeight - el.clientHeight;
         if (maxScroll <= 0) return;
 
-        el.scrollTop += 1;
+        el.scrollTop += SCROLL_PX_PER_TICK;
 
         if (el.scrollTop >= maxScroll){
           stopAutoScroll();
@@ -678,13 +716,8 @@
 
       const dt = Math.round(performance.now() - t0);
       const now = new Date();
-      lastUpdateEl.textContent = `Última atualização • ${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
-
-      if (!okCount){
-        setStatus("Sem resposta da API (verifique a KEY e restrições).");
-      } else {
-        setStatus(`Linhas: ${cards.length} • OK: ${okCount}/12 • ${dt}ms`);
-      }
+      lastUpdateEl.textContent = `Atualizado • ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+      setStatus(okCount ? `Linhas: ${cards.length} • OK: ${okCount}/12 • ${dt}ms` : "Sem resposta útil da API.");
 
       startAutoScroll();
     }
@@ -704,6 +737,7 @@
         setStatus("Carregando Google Maps…");
         await loadGoogleMaps();
         apiWarnEl.style.display = "none";
+
         setStatus("Atualizando linhas…");
         await refreshData();
         scheduleRefresh();
